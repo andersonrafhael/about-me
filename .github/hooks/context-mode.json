@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/user1/.nvm/versions/node/v22.22.1/bin/node\" \"/Users/user1/.claude/plugins/cache/context-mode/context-mode/1.0.121/hooks/vscode-copilot/pretooluse.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/user1/.nvm/versions/node/v22.22.1/bin/node\" \"/Users/user1/.claude/plugins/cache/context-mode/context-mode/1.0.121/hooks/vscode-copilot/posttooluse.mjs\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/user1/.nvm/versions/node/v22.22.1/bin/node\" \"/Users/user1/.claude/plugins/cache/context-mode/context-mode/1.0.121/hooks/vscode-copilot/precompact.mjs\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/user1/.nvm/versions/node/v22.22.1/bin/node\" \"/Users/user1/.claude/plugins/cache/context-mode/context-mode/1.0.121/hooks/vscode-copilot/sessionstart.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}
