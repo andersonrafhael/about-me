@@ -1,6 +1,7 @@
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import "@/app/globals.css";
+import { Nav } from "@/components/nav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,7 +41,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <Nav />
+        <main className="pt-16">{children}</main>
+      </body>
     </html>
   );
 }
