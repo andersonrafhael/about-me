@@ -12,13 +12,10 @@ export function TerminalTypewriter({ lines, className = "", speed = 38 }: Props)
   const [displayed, setDisplayed] = useState<string[]>([]);
   const [currentLine, setCurrentLine] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
-  const [done, setDone] = useState(false);
+  const done = currentLine >= lines.length;
 
   useEffect(() => {
-    if (currentLine >= lines.length) {
-      setDone(true);
-      return;
-    }
+    if (done) return;
 
     const line = lines[currentLine];
 
@@ -39,7 +36,7 @@ export function TerminalTypewriter({ lines, className = "", speed = 38 }: Props)
       }, 320);
       return () => clearTimeout(t);
     }
-  }, [currentLine, currentChar, lines, speed]);
+  }, [currentLine, currentChar, lines, speed, done]);
 
   return (
     <div className={`font-mono text-sm ${className}`} aria-label={lines.join(" ")}>

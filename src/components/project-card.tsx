@@ -7,9 +7,9 @@ import type { Project } from "@/data/projects";
 const categoryColors: Record<string, string> = {
   GovTech:  "text-primary border-primary/30",
   EdTech:   "text-mint border-mint/30",
-  IA:       "text-violet-400 border-violet-400/30",
-  Infra:    "text-amber-400 border-amber-400/30",
-  Pesquisa: "text-sky-400 border-sky-400/30",
+  IA:       "text-primary-light border-primary-light/30",
+  Infra:    "text-infra border-infra/30",
+  Pesquisa: "text-primary-light border-primary-light/30",
 };
 
 const statusLabel: Record<string, string> = {

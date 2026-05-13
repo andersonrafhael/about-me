@@ -2,8 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
 /* Dune Rise — wordmark e display exclusivo Requiem */
 @font-face {
   font-family: "Dune Rise";
@@ -11,12 +9,15 @@
   font-display: swap;
 }
 
+@custom-variant dark (&:is(.dark *));
+
 @theme inline {
   /* ─── FONTS ─── */
-  --font-display: "Dune Rise", ui-sans-serif, system-ui, sans-serif;
-  --font-headline: var(--font-space-grotesk, "Space Grotesk", ui-sans-serif, system-ui, sans-serif);
-  --font-sans: var(--font-inter, "Inter", ui-sans-serif, system-ui, sans-serif);
-  --font-mono: var(--font-jetbrains-mono, "JetBrains Mono", ui-monospace, monospace);
+  --font-display:   "Dune Rise", ui-sans-serif, system-ui, sans-serif;
+  --font-editorial: Georgia, "Times New Roman", serif;
+  --font-headline:  var(--font-space-grotesk, "Space Grotesk", ui-sans-serif, system-ui, sans-serif);
+  --font-sans:      var(--font-inter, "Inter", ui-sans-serif, system-ui, sans-serif);
+  --font-mono:      var(--font-jetbrains-mono, "JetBrains Mono", ui-monospace, monospace);
 
   /* ─── VOID SCALE (backgrounds) ─── */
   --color-void-deep:    #0e0e13;
@@ -27,16 +28,31 @@
 
   /* ─── PRIMARY — Violet ─── */
   --color-primary:      #8b5cf6;
+  --color-primary-deep: #6d44d4;
   --color-primary-glow: rgba(137, 111, 255, 0.3);
 
   /* ─── ACCENT — Mint (live/ativo) ─── */
   --color-mint:         #8fd6a8;
   --color-mint-dark:    #6ea883;
 
+  /* ─── SEMANTIC STATUS / CATEGORY ─── */
+  --color-warning:       #fbbf24;   /* beta, pendente, atenção */
+  --color-infra:         #34d399;   /* infra, sistemas */
+  --color-primary-light: #c4b5fd;   /* IA, categorias secundárias */
+
+  /* ─── GLASS SURFACE ─── */
+  --glass-bg:     rgba(31, 31, 37, 0.618);
+  --glass-border: rgba(202, 190, 255, 0.15);
+  --glass-shadow: rgba(137, 111, 255, 0.15);
+
   /* ─── TEXT ─── */
   --color-foreground:   #e4e1e9;
+  --color-fg-bright:    #f3f1f7;
   --color-muted:        #938ea0;
+  --color-muted-2:      #6a6677;
+  --color-muted-3:      #4a4654;
   --color-border:       #252533;
+  --color-border-2:     #34323f;
 
   /* ─── SHADCN COMPATIBILITY ─── */
   --color-background:         #131318;
@@ -74,14 +90,26 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
   }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 3px;
+  }
 }
 
 @layer components {
+  /* Nav glass */
+  .nav-glass {
+    background: var(--glass-bg);
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+
   /* Glass card — padrão para cards de projeto */
   .glass-card {
-    background: rgba(31, 31, 37, 0.618);
-    border: 1px solid rgba(202, 190, 255, 0.15);
-    box-shadow: 0 10px 30px rgba(137, 111, 255, 0.15);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px var(--glass-shadow);
     backdrop-filter: blur(12px);
   }
 
@@ -93,11 +121,73 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50%       { opacity: 0.6; transform: scale(1.3); }
   }
+
+  /* Nav live dot ping */
+  @keyframes nav-ping {
+    0%   { transform: scale(0.85); opacity: 0.5; }
+    100% { transform: scale(1.9);  opacity: 0;   }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .mint-pulse { animation: none; }
+    [class*="nav-ping"] { animation: none; }
   }
 
   /* Layout utilities CUBE CSS */
   .layout-flow    { display: flex; flex-direction: column; }
   .layout-cluster { display: flex; flex-wrap: wrap; align-items: center; }
+
+  /* Section outer — padding + border-top padrão de seção de homepage */
+  .section-outer {
+    padding-inline: clamp(24px, 4.5vw, 80px);
+    padding-block: clamp(64px, 10vh, 120px);
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Editorial page title — inner pages (escrita, sobre, pesquisa, contato) */
+  .editorial-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 700;
+    font-size: clamp(64px, 11vw, 148px);
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    color: var(--color-fg-bright);
+  }
+  .editorial-title .punct {
+    color: var(--color-primary);
+    font-style: italic;
+  }
+
+  /* Prose — conteúdo editorial em páginas de texto */
+  .prose-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #c8c5d0;
+    max-width: 65ch;
+  }
+  .prose-custom p { color: #c8c5d0; }
+  .prose-custom a { color: var(--color-foreground); transition: color 0.2s; }
+  .prose-custom a:hover { color: var(--color-primary); }
+
+  /* Section grid — 220px sticky sidebar + content */
+  .section-grid {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 65ch);
+    gap: clamp(32px, 5vw, 80px);
+  }
+  @media (max-width: 768px) {
+    .section-grid { grid-template-columns: 1fr; }
+  }
+}
+
+@layer utilities {
+  .font-editorial {
+    font-family: Georgia, "Times New Roman", serif;
+  }
+  .font-display {
+    font-family: "Dune Rise", ui-sans-serif, system-ui, sans-serif;
+  }
 }

@@ -26,7 +26,7 @@ export default async function ProjectPage({ params }: Props) {
 
   const statusColors: Record<string, string> = {
     ativo:     "text-mint",
-    beta:      "text-amber-400",
+    beta:      "text-warning",
     encerrado: "text-muted",
   };
 
@@ -72,12 +72,12 @@ export default async function ProjectPage({ params }: Props) {
         <div className="layout-flow gap-3">
           <h2 className="text-xs font-mono text-muted uppercase tracking-widest">Stack</h2>
           <div className="glass-card rounded-xl p-4 font-mono text-sm">
-            <div className="text-muted/50 mb-2 text-xs">// {name.toLowerCase()}.config</div>
+            <div className="text-muted/50 mb-2 text-xs">{`// ${name.toLowerCase()}.config`}</div>
             <div className="layout-flow gap-1">
               {stack.map((tech, i) => (
                 <div key={tech} className="layout-cluster gap-2">
                   <span className="text-primary/60 select-none">{i === 0 ? "[" : " "}</span>
-                  <span className="text-mint">"{tech}"</span>
+                  <span className="text-mint">&quot;{tech}&quot;</span>
                   <span className="text-muted/40">{i < stack.length - 1 ? "," : "]"}</span>
                 </div>
               ))}
