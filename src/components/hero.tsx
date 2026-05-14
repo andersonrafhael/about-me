@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { metrics } from "@/data/metrics";
 import { TerminalTypewriter } from "@/components/terminal-typewriter";
+import { ConstellationCanvas } from "@/components/constellation-canvas";
 
 const terminalLines = [
   "ssh sigma.requiemcompany.com.br",
@@ -23,21 +24,8 @@ export function Hero() {
     <section
       className="relative min-h-screen flex flex-col justify-center overflow-hidden px-site"
     >
-      {/* ── Grid texture (barely perceptible) ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-20"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.018) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.018) 1px, transparent 1px)
-          `,
-          backgroundSize: "96px 96px",
-          backgroundPosition: "center center",
-          maskImage: "radial-gradient(120% 90% at 60% 40%, #000 30%, transparent 90%)",
-          WebkitMaskImage: "radial-gradient(120% 90% at 60% 40%, #000 30%, transparent 90%)",
-        }}
-      />
+      {/* ── Constellation canvas (contida na hero) ── */}
+      <ConstellationCanvas />
 
       {/* ── Editorial backdrop "01" ── */}
       <div

@@ -52,9 +52,9 @@ export function TerminalTypewriter({ lines, className = "", speed = 38 }: Props)
             </span>
             <span className={isDone || isActive ? "text-foreground/80" : "text-muted/40"}>
               {text}
-              {isActive && !done && (
-                <span className="inline-block w-[2px] h-[1em] bg-mint ml-[1px] animate-pulse align-middle" />
-              )}
+              {(isActive && !done) || (done && i === lines.length - 1) ? (
+                <span className="inline-block w-[2px] h-[1em] bg-mint ml-px animate-pulse align-middle" />
+              ) : null}
             </span>
           </div>
         );
