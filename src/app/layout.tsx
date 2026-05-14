@@ -21,14 +21,36 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const siteUrl = "https://andersonrafhael.requiemcompany.com.br";
+const siteDescription =
+  "Engenheiro e fundador da Requiem Company. Construo infraestrutura digital para municípios brasileiros.";
+
 export const metadata: Metadata = {
   title: {
     default: "Anderson Rafhael — Requiem Company",
     template: "%s | Anderson Rafhael",
   },
-  description:
-    "Engenheiro e fundador da Requiem Company. Construo infraestrutura digital para municípios brasileiros.",
-  metadataBase: new URL("https://andersonrafhael.requiemcompany.com.br"),
+  description: siteDescription,
+  metadataBase: new URL(siteUrl),
+  authors: [{ name: "Anderson Rafhael" }],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: siteUrl,
+    siteName: "Anderson Rafhael",
+    title: "Anderson Rafhael — Requiem Company",
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Anderson Rafhael — Requiem Company",
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({

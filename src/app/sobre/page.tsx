@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AnimatedSection } from "@/components/animated-section";
+import { AvatarInitials } from "@/components/avatar-initials";
 
 export const metadata: Metadata = {
   title: "Sobre",
@@ -47,11 +49,14 @@ export default function SobrePage() {
         <h1 className="editorial-title">
           Sobre<span className="punct">.</span>
         </h1>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-muted text-right
-                        pb-4 leading-[1.8] hidden sm:block">
-          <b className="text-foreground font-medium block">Anderson Rafhael</b>
-          Engenheiro · Fundador<br />
-          Maceió, AL · Brasil
+        <div className="hidden sm:flex items-end gap-5 pb-4">
+          <AvatarInitials size="md" />
+          <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-muted text-right
+                          leading-[1.8]">
+            <b className="text-foreground font-medium block">Anderson Rafhael</b>
+            Engenheiro · Fundador<br />
+            Maceió, AL · Brasil
+          </div>
         </div>
       </div>
 
@@ -59,127 +64,137 @@ export default function SobrePage() {
       <div className="flex flex-col divide-y divide-border">
 
         {/* Origem */}
-        <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
-            Origem
-          </div>
-          <div className="prose-custom">
-            <p>
-              Engenheiro de computação e fundador da{" "}
-              <a href="https://requiemcompany.com.br" target="_blank" rel="noopener noreferrer"
-              className="text-foreground hover:text-primary transition-colors">Requiem Company</a>.
-              Construo infraestrutura digital para municípios brasileiros — sistemas que gestores públicos
-              usam para tomar decisões sobre sinalização viária, transporte escolar, rastreabilidade de
-              dispositivos cardíacos e distribuição de recursos culturais.
-            </p>
-            <p>
-              Nasci em 29 de abril de 1998, cresci em Alagoas. Me formei em Engenharia da Computação
-              pela UFAL. Antes mesmo de concluir a graduação, já estava construindo sistemas que
-              prefeituras alagoanas usariam para gerir serviços públicos. Não esperei o diploma para começar.
-            </p>
-            <p>
-              Fora do eixo SP-RJ. Acredito que tecnologia de qualidade não é privilégio de capital. Em
-              2022 fundei a Requiem Company com um objetivo claro: infraestrutura digital densa, sem
-              investimento externo, com utilidade social real. Cada contrato financiou o próximo.
-            </p>
-          </div>
-        </section>
+        <AnimatedSection>
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
+                            sticky top-[72px] h-fit">
+              Origem
+            </div>
+            <div className="prose-custom">
+              <p>
+                Engenheiro de computação e fundador da{" "}
+                <a href="https://requiemcompany.com.br" target="_blank" rel="noopener noreferrer"
+                className="text-foreground hover:text-primary transition-colors">Requiem Company</a>.
+                Construo infraestrutura digital para municípios brasileiros — sistemas que gestores públicos
+                usam para tomar decisões sobre sinalização viária, transporte escolar, rastreabilidade de
+                dispositivos cardíacos e distribuição de recursos culturais.
+              </p>
+              <p>
+                Nasci em 29 de abril de 1998, cresci em Alagoas. Me formei em Engenharia da Computação
+                pela UFAL. Antes mesmo de concluir a graduação, já estava construindo sistemas que
+                prefeituras alagoanas usariam para gerir serviços públicos. Não esperei o diploma para começar.
+              </p>
+              <p>
+                Fora do eixo SP-RJ. Acredito que tecnologia de qualidade não é privilégio de capital. Em
+                2022 fundei a Requiem Company com um objetivo claro: infraestrutura digital densa, sem
+                investimento externo, com utilidade social real. Cada contrato financiou o próximo.
+              </p>
+            </div>
+          </section>
+        </AnimatedSection>
 
         {/* O que faço */}
-        <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
-            O que faço
-          </div>
-          <div className="prose-custom">
-            <p>
-              Construo sistemas — não features. Cada projeto é pensado como infraestrutura:
-              multi-tenant, auditável, escalável, com governança. RBAC/ABAC nativos,
-              documentação técnica como cidadã de primeira classe, APIs com envelope padrão,
-              observabilidade desde o dia zero.
-            </p>
-            <p>
-              Transito entre engenharia de software, gestão de produto, gestão de projetos,
-              documentação técnica, atuação institucional e visão empresarial. Não sou especialista
-              em uma fatia — domino o sistema inteiro. Do levantamento de requisitos com secretários
-              municipais ao deploy em VPS próprio.
-            </p>
-            <p>
-              Paralelamente ao produto, faço pesquisa acadêmica no NEES/UFAL: engenharia de requisitos
-              formal, sistemas de informação para gestão pública, healthtech. 4 papers publicados em
-              conferências internacionais (DGO, SBCAS). Pipeline ativo para SBES 2026, SBCAS 2026 e
-              IEEE Access.
-            </p>
-          </div>
-        </section>
+        <AnimatedSection>
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
+                            sticky top-[72px] h-fit">
+              O que faço
+            </div>
+            <div className="prose-custom">
+              <p>
+                Construo sistemas — não features. Cada projeto é pensado como infraestrutura:
+                multi-tenant, auditável, escalável, com governança. RBAC/ABAC nativos,
+                documentação técnica como cidadã de primeira classe, APIs com envelope padrão,
+                observabilidade desde o dia zero.
+              </p>
+              <p>
+                Transito entre engenharia de software, gestão de produto, gestão de projetos,
+                documentação técnica, atuação institucional e visão empresarial. Não sou especialista
+                em uma fatia — domino o sistema inteiro. Do levantamento de requisitos com secretários
+                municipais ao deploy em VPS próprio.
+              </p>
+              <p>
+                Paralelamente ao produto, faço pesquisa acadêmica no NEES/UFAL: engenharia de requisitos
+                formal, sistemas de informação para gestão pública, healthtech. 4 papers publicados em
+                conferências internacionais (DGO, SBCAS). Pipeline ativo para SBES 2026, SBCAS 2026 e
+                IEEE Access.
+              </p>
+            </div>
+          </section>
+        </AnimatedSection>
 
         {/* Stack */}
-        <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
-            Stack
-          </div>
-          <div className="grid sm:grid-cols-2 gap-6">
-            {stack.map(({ cat, items }) => (
-              <div key={cat} className="flex flex-col gap-3">
-                <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
-                  {cat}
-                </span>
-                <ul className="flex flex-col gap-1.5">
-                  {items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[14px] text-foreground">
-                      <span className="w-1 h-1 rounded-full bg-primary/60 shrink-0" aria-hidden />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
+        <AnimatedSection>
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
+                            sticky top-[72px] h-fit">
+              Stack
+            </div>
+            <div className="grid sm:grid-cols-2 gap-6">
+              {stack.map(({ cat, items }) => (
+                <div key={cat} className="flex flex-col gap-3">
+                  <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
+                    {cat}
+                  </span>
+                  <ul className="flex flex-col gap-1.5">
+                    {items.map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-[14px] text-foreground">
+                        <span className="w-1 h-1 rounded-full bg-primary/60 shrink-0" aria-hidden />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        </AnimatedSection>
 
         {/* Trajetória */}
-        <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
-            Trajetória
-          </div>
-          <div className="flex flex-col gap-0">
-            {timeline.map(({ year, event }, i) => (
-              <div key={i} className="flex gap-6 py-4 border-b border-border/40 last:border-0">
-                <span className="font-mono text-[12px] text-primary shrink-0 w-10">{year}</span>
-                <span className="text-[14px] text-foreground leading-snug">{event}</span>
-              </div>
-            ))}
-          </div>
-        </section>
+        <AnimatedSection>
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
+                            sticky top-[72px] h-fit">
+              Trajetória
+            </div>
+            <div className="flex flex-col gap-0">
+              {timeline.map(({ year, event }, i) => (
+                <div key={i} className="flex gap-6 py-4 border-b border-border/40 last:border-0">
+                  <span className="font-mono text-[12px] text-primary shrink-0 w-10">{year}</span>
+                  <span className="text-[14px] text-foreground leading-snug">{event}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        </AnimatedSection>
 
         {/* Valores */}
-        <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
-            Valores
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              "Excelência como dever",
-              "Utilidade real",
-              "Legado",
-              "Estrutura antes de estética",
-              "Responsabilidade",
-              "Escala com sentido",
-              "Serviço público",
-              "Autonomia",
-            ].map((v) => (
-              <span key={v}
-                className="px-3 py-1.5 rounded border border-border text-[12px] font-mono text-muted
-                           tracking-[0.06em]">
-                {v}
-              </span>
-            ))}
-          </div>
-        </section>
+        <AnimatedSection>
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
+                            sticky top-[72px] h-fit">
+              Valores
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Excelência como dever",
+                "Utilidade real",
+                "Legado",
+                "Estrutura antes de estética",
+                "Responsabilidade",
+                "Escala com sentido",
+                "Serviço público",
+                "Autonomia",
+              ].map((v) => (
+                <span key={v}
+                  className="px-3 py-1.5 rounded border border-border text-[12px] font-mono text-muted
+                             tracking-[0.06em]">
+                  {v}
+                </span>
+              ))}
+            </div>
+          </section>
+        </AnimatedSection>
 
       </div>
 
