@@ -21,8 +21,7 @@ const fade = (delay: number) => ({
 export function Hero() {
   return (
     <section
-      className="relative min-h-screen flex flex-col justify-center overflow-hidden
-                 px-[clamp(24px,4.5vw,80px)]"
+      className="relative min-h-screen flex flex-col justify-center overflow-hidden px-site"
     >
       {/* ── Grid texture (barely perceptible) ── */}
       <div
@@ -85,12 +84,10 @@ export function Hero() {
 
           {/* Headline */}
           <motion.div {...fade(0.08)}>
-            <h1 className="font-headline font-bold leading-[0.86] tracking-[-0.04em] text-fg-bright"
-                style={{ fontSize: "clamp(56px, 9vw, 128px)" }}>
+            <h1 className="hero-headline font-headline font-bold leading-[0.86] tracking-[-0.04em] text-fg-bright">
               Infraestrutura digital<span className="text-primary">.</span>
             </h1>
-            <p className="font-headline italic text-foreground/55 leading-[0.9] tracking-[-0.03em] mt-2"
-               style={{ fontSize: "clamp(22px, 3.2vw, 48px)" }}>
+            <p className="hero-subline font-headline italic text-foreground/70 leading-[0.9] tracking-[-0.03em] mt-2">
               de ponta para{" "}
               <span className="text-foreground underline decoration-primary/60 underline-offset-4 decoration-[2px]">gestão pública</span>
               ,{" "}
@@ -101,35 +98,17 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* Subtítulo */}
-          <motion.p
-            {...fade(0.16)}
-            className="text-foreground/70 leading-relaxed max-w-[52ch] text-[17px]"
-          >
-            Engenheiro de software e fundador da{" "}
-            <a
-              href="https://requiemcompany.com.br"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground hover:text-primary transition-colors"
-            >
-              Requiem Company
-            </a>
-            . Construo sistemas que gestores públicos usam para tomar decisões sobre transporte escolar,
-            gestão urbana e saúde municipal — fora do eixo SP-RJ.
-          </motion.p>
-
           {/* Métricas */}
           <motion.div
-            {...fade(0.22)}
+            {...fade(0.16)}
             className="flex flex-wrap gap-x-8 gap-y-3 pt-2"
           >
             {metrics.map((m) => (
               <div key={m.label} className="flex flex-col">
-                <span className="font-headline font-bold text-fg-bright text-3xl leading-none tracking-tight">
+                <span className="font-headline font-bold text-fg-bright text-2xl leading-none tracking-tight">
                   {m.value}
                 </span>
-                <span className="font-mono text-[11px] text-foreground/50 tracking-[0.12em] uppercase mt-1">
+                <span className="font-mono text-[11px] text-foreground/65 tracking-[0.12em] uppercase mt-1">
                   {m.label}
                 </span>
               </div>
@@ -137,12 +116,12 @@ export function Hero() {
           </motion.div>
 
           {/* CTAs */}
-          <motion.div {...fade(0.28)} className="flex flex-wrap gap-3 pt-2">
+          <motion.div {...fade(0.22)} className="flex flex-wrap gap-3 pt-2">
             <Link
               href="/projetos"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
                          bg-primary text-white font-medium text-sm
-                         hover:bg-[#6d44d4] transition-colors"
+                         hover:bg-primary-deep transition-colors"
             >
               Ver projetos
               <span aria-hidden>→</span>
@@ -166,29 +145,18 @@ export function Hero() {
           transition={{ delay: 0.3, duration: 0.65, ease: "easeOut" }}
           className="hidden lg:flex flex-col gap-4"
         >
-          {/* Status card */}
-          <div className="glass-card rounded-xl p-5 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-foreground/60">
-                Status · 2026
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-mint mint-pulse" aria-hidden />
-                <span className="font-mono text-[10px] text-mint tracking-[0.12em] uppercase">live</span>
-              </span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-fg-bright font-medium text-[15px]">Disponível para projetos</span>
-              <span className="font-mono text-[11px] text-foreground/55">Resposta &lt; 24h, seg–sex</span>
-            </div>
-          </div>
-
-          {/* Meta list */}
+          {/* Status + meta card */}
           <div className="glass-card rounded-xl p-5 flex flex-col gap-0">
+            <div className="flex items-center justify-between pb-3 mb-1 border-b border-border/40">
+              <span className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-mint mint-pulse" aria-hidden />
+                <span className="text-fg-bright font-medium text-[14px]">Disponível para projetos</span>
+              </span>
+              <span className="font-mono text-[10px] text-mint tracking-[0.12em] uppercase">live</span>
+            </div>
             {[
-              { k: "Base", v: "Maceió, AL · Brasil" },
-              { k: "Coord", v: "-9.6658° S, 35.7353° W" },
-              { k: "Foco", v: "GovTech · HealthTech · EdTech" },
+              { k: "Base",    v: "Maceió, AL · Brasil" },
+              { k: "Foco",    v: "GovTech · HealthTech · EdTech" },
               { k: "Capital", v: "Bootstrap · sem externo" },
             ].map(({ k, v }) => (
               <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-border/40 last:border-0">
@@ -203,7 +171,7 @@ export function Hero() {
           {/* Terminal */}
           <div className="glass-card rounded-xl overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40 bg-void/60">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#f87171]/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-destructive/70" />
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
               <span className="w-2.5 h-2.5 rounded-full bg-mint/70" />
               <span className="ml-2 text-[11px] text-muted font-mono">~/requiemcompany</span>

@@ -19,7 +19,7 @@ const navLinkClass = cva(
     variants: {
       active: {
         true: "text-primary",
-        false: "text-foreground/55",
+        false: "text-foreground/70",
       },
     },
     defaultVariants: { active: false },
@@ -30,7 +30,7 @@ const navNumClass = cva("text-[10px]", {
   variants: {
     active: {
       true: "text-primary/70",
-      false: "text-foreground/50",
+      false: "text-foreground/60",
     },
   },
   defaultVariants: { active: false },
@@ -87,7 +87,7 @@ export function Nav() {
         <div className="flex items-center gap-[18px] min-w-0 whitespace-nowrap">
           <Link
             href="/"
-            className="font-display font-bold text-[28px] leading-none tracking-tight
+            className="font-display font-bold text-[22px] leading-none tracking-tight
                        text-foreground hover:text-fg-bright transition-colors flex items-baseline gap-px"
           >
             AR

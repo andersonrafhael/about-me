@@ -48,6 +48,7 @@
   /* ─── TEXT ─── */
   --color-foreground:   #e4e1e9;
   --color-fg-bright:    #f3f1f7;
+  --color-fg-dim:       #c8c5d0;
   --color-muted:        #938ea0;
   --color-muted-2:      #6a6677;
   --color-muted-3:      #4a4654;
@@ -56,7 +57,6 @@
 
   /* ─── SHADCN COMPATIBILITY ─── */
   --color-background:         #131318;
-  --color-foreground:         #e4e1e9;
   --color-card:               #1f1f25;
   --color-card-foreground:    #e4e1e9;
   --color-popover:            #1f1f25;
@@ -64,12 +64,10 @@
   --color-primary-foreground: #ffffff;
   --color-secondary:          #1b1b20;
   --color-secondary-foreground: #e4e1e9;
-  --color-muted:              #2a292f;
   --color-muted-foreground:   #938ea0;
   --color-accent:             #2a292f;
   --color-accent-foreground:  #e4e1e9;
   --color-destructive:        #f87171;
-  --color-border:             #252533;
   --color-input:              #252533;
   --color-ring:               #8b5cf6;
   --radius:                   0.5rem;
@@ -99,18 +97,19 @@
 @layer components {
   /* Nav glass */
   .nav-glass {
-    background: var(--glass-bg);
-    border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    background: rgba(19, 19, 24, 0.82);
+    border-bottom: 1px solid rgba(202, 190, 255, 0.12);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
   }
 
   /* Glass card — padrão para cards de projeto */
   .glass-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 10px 30px var(--glass-shadow);
+    background: rgba(31, 31, 37, 0.65);
+    border: 1px solid rgba(202, 190, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(137, 111, 255, 0.12);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   /* Mint pulse — dot de status "ativo" */
@@ -148,10 +147,23 @@
   .editorial-title {
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
-    font-size: clamp(64px, 11vw, 148px);
+    font-size: clamp(44px, 7vw, 96px);
     line-height: 0.88;
     letter-spacing: -0.03em;
     color: var(--color-fg-bright);
+  }
+
+  /* Hero type scale */
+  .hero-headline {
+    font-size: clamp(40px, 6.5vw, 88px);
+  }
+  .hero-subline {
+    font-size: clamp(18px, 2.4vw, 32px);
+  }
+
+  /* Section heading — h2 de seções da homepage */
+  .section-heading {
+    font-size: clamp(26px, 3.2vw, 44px);
   }
   .editorial-title .punct {
     color: var(--color-primary);
@@ -165,7 +177,7 @@
     gap: 1.25rem;
     font-size: 15px;
     line-height: 1.75;
-    color: #c8c5d0;
+    color: var(--color-fg-dim);
     max-width: 65ch;
   }
   .prose-custom p { color: #c8c5d0; }
@@ -189,5 +201,8 @@
   }
   .font-display {
     font-family: "Dune Rise", ui-sans-serif, system-ui, sans-serif;
+  }
+  .px-site {
+    padding-inline: clamp(24px, 4.5vw, 80px);
   }
 }

@@ -42,8 +42,7 @@ export function FeaturedProjects() {
               Trabalhos selecionados
             </p>
             <h2
-              className="font-headline font-bold text-fg-bright leading-[0.9] tracking-[-0.03em]"
-              style={{ fontSize: "clamp(36px, 5vw, 64px)" }}
+              className="section-heading font-headline font-bold text-fg-bright leading-[0.9] tracking-[-0.03em]"
             >
               O que construo<span className="text-primary">.</span>
             </h2>
@@ -51,7 +50,7 @@ export function FeaturedProjects() {
           <Link
             href="/projetos"
             className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[12px]
-                       text-foreground/50 hover:text-primary transition-colors pb-1"
+                       text-foreground/60 hover:text-primary transition-colors pb-1"
           >
             ver todos →
           </Link>
@@ -95,7 +94,7 @@ export function FeaturedProjects() {
                         className={`w-1.5 h-1.5 rounded-full ${statusDot[project.status]}`}
                         aria-hidden
                       />
-                      <span className="font-mono text-[10px] text-foreground/60 tracking-[0.1em] uppercase">
+                      <span className="font-mono text-[10px] text-foreground/60 tracking-widest uppercase">
                         {statusLabel[project.status]}
                       </span>
                     </span>
@@ -136,7 +135,7 @@ export function FeaturedProjects() {
         <div className="mt-6 sm:hidden">
           <Link
             href="/projetos"
-            className="font-mono text-[12px] text-foreground/50 hover:text-primary transition-colors"
+            className="font-mono text-[12px] text-foreground/60 hover:text-primary transition-colors"
           >
             ver todos os projetos →
           </Link>
