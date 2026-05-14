@@ -28,7 +28,7 @@ export const projects: Project[] = [
     description:
       "Sistema de gestão territorial com georreferenciamento, operação em campo, RBAC/ABAC e suporte multi-tenant para prefeituras alagoanas. Ciclo completo: Planejamento → Projeto → Aprovação → Ordem Administrativa → Execução em Campo → Estoque → Inventário → Relatórios → Inteligência. Gestores municipais usam o Sigma para tomar decisões sobre sinalização viária, pavimentação e infraestrutura urbana — com visibilidade geoespacial e rastreabilidade de execução.",
     stack: ["Next.js", "Django", "PostGIS", "Supabase", "Cloudflare"],
-    metrics: "5+ municípios em operação · interior de Alagoas",
+    metrics: "Municípios alagoanos em operação · sinalização, pavimentação, infraestrutura",
   },
   {
     slug: "sgtu",
@@ -59,13 +59,14 @@ export const projects: Project[] = [
     slug: "microred",
     name: "MicroRed",
     category: "Infra",
-    status: "beta",
+    status: "ativo",
     tier: 1,
     tagline: "Mobilidade elétrica e armazenamento de energia com OCPP 2.0.",
     description:
-      "Plataforma para gestão de redes de mobilidade elétrica (EVs) com armazenamento de energia (ESS) e integração do protocolo OCPP 2.0. Cobre estações de carregamento, controle de carga, tarifação e relatórios de consumo. Mercado emergente no Nordeste sem solução equivalente disponível na região. Em desenvolvimento com parceiros de infraestrutura elétrica.",
+      "Plataforma completa para gestão de redes de mobilidade elétrica com integração do protocolo OCPP 2.0. Inclui plataforma de gestão de estações, aplicativo de recarga para usuário final e módulo de armazenamento de energia (ESS). Em plena operação com ambientes de produção ativos — gestão, aplicativo e infraestrutura de carregamento.",
     stack: ["Django", "OCPP 2.0", "IoT", "WebSocket", "PostgreSQL"],
-    metrics: "Protocolo OCPP 2.0 · ESS · mercado emergente no Nordeste",
+    metrics: "Plataforma de gestão · aplicativo de recarga · ESS em produção",
+    url: "https://mred.com.br",
   },
   {
     slug: "synapse-lab",
@@ -98,7 +99,7 @@ export const projects: Project[] = [
     tagline: "Engenharia formal de requisitos — Requiem Maturity Scale.",
     description:
       "Framework de engenharia de requisitos com hierarquia verificável, maturidade cumulativa e degradação temporal (Requiem Maturity Scale — RMS). Aplicado em sistemas multi-tenant de gestão pública. Objeto de pesquisa acadêmica com paper em submissão para o SBES 2026. A escala RHEMA permite classificar, verificar e evoluir requisitos ao longo do ciclo de vida do sistema com rastreabilidade formal.",
-    stack: ["Next.js", "TypeScript", "LaTeX"],
+    stack: ["IEEE 29148", "Arc42", "C4 Model", "LaTeX", "RMS"],
     url: "https://rhema.requiemcompany.com.br",
     metrics: "Paper submetido ao SBES 2026",
   },

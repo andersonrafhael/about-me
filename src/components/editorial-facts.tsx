@@ -5,18 +5,18 @@ import { motion } from "framer-motion";
 const facts = [
   {
     n: "01",
-    title: "Comecei antes do diploma.",
-    body: "Construí o primeiro sistema municipal antes de me formar em Engenharia da Computação pela UFAL. Não esperei a permissão formal para começar.",
+    title: "Primeiro contrato antes de qualquer credencial.",
+    body: "O primeiro sistema municipal surgiu antes de qualquer formalidade — sem empresa registrada, sem capital externo. Veio da qualidade do trabalho, não do currículo.",
   },
   {
     n: "02",
     title: "Bootstrap desde o início.",
-    body: "Nunca recebi capital externo. Cada contrato financiou o próximo. Em produção: 5+ municípios, R$2,98bi em políticas culturais geridas.",
+    body: "Zero capital externo captado. Cada contrato financiou o próximo. Em produção: R$2,98bi em políticas culturais geridas, plataformas ativas em gestão pública, saúde e mobilidade.",
   },
   {
     n: "03",
     title: "Nordeste como escolha.",
-    body: "Base em Maceió. Clientes em municípios do interior de Alagoas. Tecnologia de qualidade não é privilégio do eixo SP-RJ — é uma questão de onde você decide construir.",
+    body: "Base em Maceió. Clientes em municípios do interior de Alagoas. Tecnologia de excelência não é privilégio do eixo SP-RJ — é uma questão de onde você decide construir.",
   },
   {
     n: "04",

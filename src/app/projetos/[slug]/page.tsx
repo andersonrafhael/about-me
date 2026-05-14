@@ -21,8 +21,13 @@ export default async function ProjectPage({ params }: Props) {
   const project = projects.find((p) => p.slug === slug);
   if (!project) notFound();
 
-  const { name, category, status, tagline, description, stack, metrics, url, tier, role } =
-    project;
+  const { name, category, status, tagline, description, metrics, url, tier, role } = project;
+
+  const statusLabel: Record<string, string> = {
+    ativo:     "em operação",
+    beta:      "beta",
+    encerrado: "encerrado",
+  };
 
   const statusColors: Record<string, string> = {
     ativo:     "text-mint",
@@ -31,72 +36,75 @@ export default async function ProjectPage({ params }: Props) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-20">
-      <div className="layout-flow gap-12">
-        {/* Breadcrumb */}
-        <Link
-          href="/projetos"
-          className="text-sm text-muted hover:text-foreground transition-colors font-mono"
-        >
-          ← /projetos
-        </Link>
+    <div className="min-h-screen px-[clamp(24px,4.5vw,80px)] max-w-[1280px] mx-auto">
 
-        {/* Header */}
-        <div className="layout-flow gap-4">
-          <div className="layout-cluster gap-3">
-            <span className="text-xs font-mono text-muted border border-border px-2 py-0.5 rounded-full">
-              {category}
-            </span>
-            <span className={`text-xs font-mono ${statusColors[status] ?? "text-muted"}`}>
-              {status}
-            </span>
-            {tier === 2 && role && (
-              <span className="text-xs font-mono text-foreground/50">{role}</span>
-            )}
-          </div>
-          <h1 className="font-headline text-4xl font-bold text-foreground">{name}</h1>
-          <p className="text-lg text-foreground/80 leading-relaxed">{tagline}</p>
-        </div>
+      {/* ── Breadcrumb ── */}
+      <div className="pt-[calc(56px+clamp(40px,6vh,80px))] mb-16">
+        <nav className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
+                        flex items-center gap-2.5" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-foreground transition-colors text-muted">Início</Link>
+          <span className="text-muted-2">/</span>
+          <Link href="/projetos" className="hover:text-foreground transition-colors text-muted">Projetos</Link>
+          <span className="text-muted-2">/</span>
+          <span className="text-foreground font-medium">{name}</span>
+        </nav>
+      </div>
 
-        {/* Descrição */}
-        <div className="layout-flow gap-4 text-foreground/75 leading-relaxed">
-          <p>{description}</p>
-          {metrics && (
-            <p className="font-mono text-sm text-primary border-l-2 border-primary pl-4">
-              {metrics}
-            </p>
+      {/* ── Header ── */}
+      <div className="mb-[clamp(48px,7vh,88px)] pb-[clamp(40px,5vh,64px)] border-b border-border">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted
+                           border border-border/60 px-2 py-0.5 rounded">
+            {category}
+          </span>
+          <span className={`font-mono text-[10px] tracking-[0.18em] uppercase ${statusColors[status] ?? "text-muted"}`}>
+            {statusLabel[status] ?? status}
+          </span>
+          {tier === 2 && role && (
+            <span className="font-mono text-[10px] text-foreground/45 tracking-[0.12em] uppercase">
+              {role}
+            </span>
           )}
         </div>
+        <h1 className="editorial-title mb-4">
+          {name}<span className="punct">.</span>
+        </h1>
+        <p className="text-[18px] text-foreground/75 leading-relaxed max-w-[60ch]">
+          {tagline}
+        </p>
+      </div>
 
-        {/* Stack como bloco de código */}
-        <div className="layout-flow gap-3">
-          <h2 className="text-xs font-mono text-muted uppercase tracking-widest">Stack</h2>
-          <div className="glass-card rounded-xl p-4 font-mono text-sm">
-            <div className="text-foreground/30 mb-2 text-xs">{`// ${name.toLowerCase()}.config`}</div>
-            <div className="layout-flow gap-1">
-              {stack.map((tech, i) => (
-                <div key={tech} className="layout-cluster gap-2">
-                  <span className="text-primary/60 select-none">{i === 0 ? "[" : " "}</span>
-                  <span className="text-mint">&quot;{tech}&quot;</span>
-                  <span className="text-foreground/25">{i < stack.length - 1 ? "," : "]"}</span>
-                </div>
-              ))}
-            </div>
+      {/* ── Descrição ── */}
+      <div className="max-w-[72ch] mb-[clamp(48px,7vh,88px)]">
+        <p className="text-[16px] text-foreground/80 leading-[1.75]">
+          {description}
+        </p>
+
+        {metrics && (
+          <div className="mt-8 pl-5 border-l-2 border-primary/40">
+            <p className="font-mono text-[13px] text-primary/80 leading-relaxed">
+              {metrics}
+            </p>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* CTA */}
-        {url && (
+      {/* ── CTA ── */}
+      {url && (
+        <div className="border-t border-border pt-8">
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-mono"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
+                       bg-primary text-white font-medium text-sm
+                       hover:bg-primary-deep transition-colors"
           >
-            → ver projeto ao vivo
+            Ver projeto ao vivo
+            <span aria-hidden>→</span>
           </a>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

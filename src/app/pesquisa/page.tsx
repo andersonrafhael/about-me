@@ -169,8 +169,8 @@ export default function PesquisaPage() {
           </div>
           <div className="flex flex-col gap-6">
             <p className="text-foreground/70 text-[14px] leading-relaxed max-w-[56ch]">
-              4 artigos publicados em conferências internacionais — majoritariamente como
-              co-autor em projetos do NEES/UFAL. Títulos e PDFs disponíveis no Currículo Lattes.
+              4 artigos publicados em conferências internacionais no âmbito de pesquisas do NEES/UFAL.
+              Títulos e PDFs disponíveis no Currículo Lattes.
             </p>
             <div className="flex flex-col gap-0 border-t border-border">
               {published.map(({ venue, year, count, note }, i) => (

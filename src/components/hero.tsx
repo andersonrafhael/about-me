@@ -7,7 +7,7 @@ import { TerminalTypewriter } from "@/components/terminal-typewriter";
 
 const terminalLines = [
   "ssh sigma.requiemcompany.com.br",
-  "// 5 municípios · Alagoas, Nordeste",
+  "// sistemas ativos · sinalização, infraestrutura",
   "systemctl status sgtu",
   "● active (running) · transporte escolar",
 ];

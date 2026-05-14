@@ -6,27 +6,14 @@ import { AvatarInitials } from "@/components/avatar-initials";
 export const metadata: Metadata = {
   title: "Sobre",
   description:
-    "Anderson Rafhael — engenheiro de computação e fundador da Requiem Company. Construo infraestrutura digital para municípios brasileiros.",
+    "Anderson Rafhael — fundador da Requiem Company e engenheiro de software. Construo infraestrutura digital que apoia gestão pública, políticas sociais e tomada de decisão com impacto real.",
 };
 
 const stack = [
   { cat: "Frontend", items: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"] },
-  { cat: "Backend", items: ["Django 5", "DRF", "PostgreSQL", "Supabase"] },
+  { cat: "Backend", items: ["Django 5", "DRF", "PostgreSQL", "PostGIS"] },
   { cat: "Infra", items: ["Docker", "Nginx", "Cloudflare", "VPS próprio"] },
   { cat: "IA / ML", items: ["LLM APIs", "RAG", "Claude API", "Python"] },
-];
-
-const timeline = [
-  { year: "2021", event: "Início no NEES/UFAL — primeiro contato com sistemas reais de informação para governo" },
-  { year: "2022", event: "Fundei a Requiem Company em Maceió, AL — primeiro contrato municipal antes de concluir a graduação" },
-  { year: "2023", event: "Sigma em desenvolvimento — sistema de gestão urbana com georreferenciamento para prefeituras alagoanas" },
-  { year: "2024", event: "Sigma em produção: 5+ municípios no interior de Alagoas usando o sistema" },
-  { year: "2024", event: "SGTU lançado — gestão de transporte escolar multi-tenant para secretarias municipais" },
-  { year: "2024", event: "Primeiros papers aceitos em conferências internacionais (DGO, SBCAS)" },
-  { year: "2025", event: "CultBR, SGDI, Synapse Lab, MicroRed — expansão do portfólio para saúde, cultura e mobilidade" },
-  { year: "2025", event: "CultBR em produção: R$2,98bi em políticas culturais geridas na plataforma" },
-  { year: "2026", event: "Pipeline de pesquisa ativo: RMS (SBES), SGDI (SBCAS), MicroRed (IEEE Access)" },
-  { year: "2026", event: "Objetivo: Forbes Under 30 Brasil · Categoria Tecnologia & Inovação" },
 ];
 
 export default function SobrePage() {
@@ -54,7 +41,7 @@ export default function SobrePage() {
           <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-muted text-right
                           leading-[1.8]">
             <b className="text-foreground font-medium block">Anderson Rafhael</b>
-            Engenheiro · Fundador<br />
+            Fundador · Engenheiro<br />
             Maceió, AL · Brasil
           </div>
         </div>
@@ -65,29 +52,31 @@ export default function SobrePage() {
 
         {/* Origem */}
         <AnimatedSection>
-          <section className="section-grid py-[clamp(48px,7vh,88px)]">
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                            sticky top-[72px] h-fit">
-              Origem
+          <section className="py-[clamp(48px,7vh,88px)]">
+            <div className="flex items-center gap-5 mb-8">
+              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
+                Origem
+              </h2>
+              <div className="flex-1 h-px bg-border/40" aria-hidden />
             </div>
-            <div className="prose-custom">
+            <div className="prose-custom max-w-[72ch]">
               <p>
-                Engenheiro de computação e fundador da{" "}
+                Fundador da{" "}
                 <a href="https://requiemcompany.com.br" target="_blank" rel="noopener noreferrer"
-                className="text-foreground hover:text-primary transition-colors">Requiem Company</a>.
-                Construo infraestrutura digital para municípios brasileiros — sistemas que gestores públicos
-                usam para tomar decisões sobre sinalização viária, transporte escolar, rastreabilidade de
-                dispositivos cardíacos e distribuição de recursos culturais.
+                className="text-foreground hover:text-primary transition-colors">Requiem Company</a>{" "}
+                e engenheiro de software com foco em sistemas institucionais. Construo infraestrutura
+                digital que apoia políticas públicas, gerencia processos críticos e oferece suporte à
+                tomada de decisão com impacto real — sobre cidades, sobre escolas, sobre saúde pública.
               </p>
               <p>
-                Nasci em 29 de abril de 1998, cresci em Alagoas. Me formei em Engenharia da Computação
-                pela UFAL. Antes mesmo de concluir a graduação, já estava construindo sistemas que
-                prefeituras alagoanas usariam para gerir serviços públicos. Não esperei o diploma para começar.
+                Nasci em 29 de abril de 1998, cresci em Alagoas. Comecei a construir sistemas para
+                prefeituras antes de qualquer credencial formal — o primeiro contrato municipal veio
+                da qualidade do trabalho, não do currículo. Não esperei condições ideais para começar.
               </p>
               <p>
-                Fora do eixo SP-RJ. Acredito que tecnologia de qualidade não é privilégio de capital. Em
-                2022 fundei a Requiem Company com um objetivo claro: infraestrutura digital densa, sem
-                investimento externo, com utilidade social real. Cada contrato financiou o próximo.
+                Fora do eixo SP-RJ. Em 2024 fundei a Requiem Company com um objetivo claro:
+                infraestrutura digital de excelência com densidade técnica, utilidade social real
+                e zero capital externo. Cada contrato financiou o próximo — e ainda é assim.
               </p>
             </div>
           </section>
@@ -95,12 +84,14 @@ export default function SobrePage() {
 
         {/* O que faço */}
         <AnimatedSection>
-          <section className="section-grid py-[clamp(48px,7vh,88px)]">
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                            sticky top-[72px] h-fit">
-              O que faço
+          <section className="py-[clamp(48px,7vh,88px)]">
+            <div className="flex items-center gap-5 mb-8">
+              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
+                O que faço
+              </h2>
+              <div className="flex-1 h-px bg-border/40" aria-hidden />
             </div>
-            <div className="prose-custom">
+            <div className="prose-custom max-w-[72ch]">
               <p>
                 Construo sistemas — não features. Cada projeto é pensado como infraestrutura:
                 multi-tenant, auditável, escalável, com governança. RBAC/ABAC nativos,
@@ -125,12 +116,14 @@ export default function SobrePage() {
 
         {/* Stack */}
         <AnimatedSection>
-          <section className="section-grid py-[clamp(48px,7vh,88px)]">
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                            sticky top-[72px] h-fit">
-              Stack
+          <section className="py-[clamp(48px,7vh,88px)]">
+            <div className="flex items-center gap-5 mb-8">
+              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
+                Stack
+              </h2>
+              <div className="flex-1 h-px bg-border/40" aria-hidden />
             </div>
-            <div className="grid sm:grid-cols-2 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {stack.map(({ cat, items }) => (
                 <div key={cat} className="flex flex-col gap-3">
                   <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
@@ -150,30 +143,14 @@ export default function SobrePage() {
           </section>
         </AnimatedSection>
 
-        {/* Trajetória */}
-        <AnimatedSection>
-          <section className="section-grid py-[clamp(48px,7vh,88px)]">
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                            sticky top-[72px] h-fit">
-              Trajetória
-            </div>
-            <div className="flex flex-col gap-0">
-              {timeline.map(({ year, event }, i) => (
-                <div key={i} className="flex gap-6 py-4 border-b border-border/40 last:border-0">
-                  <span className="font-mono text-[12px] text-primary shrink-0 w-10">{year}</span>
-                  <span className="text-[14px] text-foreground leading-snug">{event}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        </AnimatedSection>
-
         {/* Valores */}
         <AnimatedSection>
-          <section className="section-grid py-[clamp(48px,7vh,88px)]">
-            <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                            sticky top-[72px] h-fit">
-              Valores
+          <section className="py-[clamp(48px,7vh,88px)]">
+            <div className="flex items-center gap-5 mb-8">
+              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
+                Valores
+              </h2>
+              <div className="flex-1 h-px bg-border/40" aria-hidden />
             </div>
             <div className="flex flex-wrap gap-2">
               {[
