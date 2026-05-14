@@ -6,7 +6,7 @@ import Link from "next/link";
 const markers = [
   { label: "Sem capital externo", detail: "bootstrap desde o primeiro contrato" },
   { label: "Nordeste · Alagoas",  detail: "Maceió como base, Brasil como mercado" },
-  { label: "EC · UFAL · 2022",   detail: "engenharia aplicada, não acadêmica" },
+  { label: "Produto + Pesquisa",  detail: "código e ciência se alimentam" },
 ];
 
 export function Manifesto() {
@@ -44,9 +44,9 @@ export function Manifesto() {
             >
               Requiem Company
             </a>{" "}
-            em 2022 com um objetivo claro: infraestrutura digital com
-            densidade técnica e utilidade social, fora do eixo SP-RJ, sem
-            capital externo.
+            em 2024 com um objetivo claro: infraestrutura digital de
+            excelência com densidade técnica e utilidade social real, fora do
+            eixo SP-RJ, sem capital externo.
           </p>
 
           <Link
