@@ -1,0 +1,98 @@
+---
+slug: "multitenancy-governo-vs-saas"
+title: "Multitenancy em governo não é multitenancy em SaaS"
+excerpt: "Aplicar padrões de multi-tenant B2B em sistemas de governo sem ajustar as premissas não é errado — é arriscado de um jeito que só aparece em auditoria, processo judicial, ou cruzamento de dados entre convênios."
+date: "2026-05-14"
+tags: ["GovTech", "Arquitetura", "LGPD", "Engenharia de Software"]
+readTime: 8
+---
+
+Multitenancy é um problema resolvido. Há décadas de literatura, padrões estabelecidos, e frameworks que implementam a maior parte das decisões difíceis. Schema-per-tenant, row-level security, tenant isolation via middleware — qualquer time de engenharia experiente consegue implementar isso.
+
+O problema é quando você aplica esses padrões em governo sem ajustar para o que é diferente.
+
+Construindo sistemas multi-tenant para entes públicos — prefeituras, secretarias, autarquias — em três projetos distintos, chegamos a um conjunto de decisões que não aparecem nos tutoriais de multitenancy. Algumas delas custaram retrabalho. Todas elas foram necessárias.
+
+## O que os tutoriais assumem
+
+Os guias de multitenancy SaaS operam com premissas razoáveis para B2B: o cliente contrata a plataforma, é dono dos dados que insere, pode exportar e deletar quando quiser. O isolamento entre tenants existe para que um cliente não veja os dados de outro. O controle de acesso dentro de um tenant é problema do cliente configurar, não da plataforma aplicar.
+
+Essas premissas funcionam quando o tenant é uma empresa e os dados são ativos corporativos.
+
+Quando o tenant é uma prefeitura e os dados são registros de cidadãos, as três premissas quebram simultaneamente.
+
+## O que muda quando o tenant é ente público
+
+**O tenant não é o dono do dado. O cidadão é.**
+
+Isso não é princípio abstrato — tem implicação técnica concreta.
+
+A LGPD (Lei Geral de Proteção de Dados, Lei 13.709/2018) classifica entes públicos como controladores de dados de cidadãos. O dado de um residente de Arapiraca processado pela prefeitura de Arapiraca não pertence à prefeitura — pertence ao titular, e a prefeitura tem obrigações de responsabilidade, transparência e minimização que não se extinguem com o encerramento do contrato de SaaS.
+
+O Art. 46 da LGPD exige que controladores adotem "medidas de segurança, técnicas e administrativas aptas a proteger os dados pessoais". Em ente público, "encerrar o contrato e apagar os dados" não é a saída limpa que seria em B2B. Há obrigação de preservação conforme legislação de arquivo público (Lei 8.159/1991), e em alguns casos há prazo legal de retenção que independe da vontade do contratante.
+
+**O isolamento não é só entre tenants — é dentro do tenant.**
+
+Em SaaS B2B, o controle de acesso interno é problema do cliente. A plataforma entrega RBAC básico e o cliente configura. Em governo, o acesso a dados é regulado por legislação — Lei de Acesso à Informação (Lei 12.527/2011), sigilo de investigação, dados sensíveis de saúde — e o sistema precisa aplicar esses controles, não apenas oferecer a primitiva de configuração.
+
+Um técnico de campo de uma secretaria municipal não pode ver dados de outra secretaria do mesmo município. Um prefeito em exercício não necessariamente tem acesso a todas as informações de todos os órgãos. Um servidor em contrato temporário tem restrições diferentes de um efetivo. Nenhuma dessas regras emerge naturalmente de RBAC simples de roles e permissões.
+
+**O que entra em produção precisa de rastro auditável.**
+
+A Lei 14.133/2021 (Nova Lei de Licitações e Contratos) exige que atos da administração pública sejam motivados e documentados. Em sistemas que registram informações sobre obra pública, gestão de ativos, ou aplicação de recursos, cada alteração relevante precisa de log imutável com identificação do agente, timestamp e dado anterior.
+
+Isso não é feature — é requisito legal. A diferença entre "log de aplicação" e "log de auditoria para fins jurídicos" é substancial. Um log que pode ser alterado, um log sem identificação de agente autenticado, ou um log rotacionado e descartado depois de 30 dias não serve como evidência quando o TCU ou um processo judicial o solicita.
+
+## As três decisões que custaram retrabalho
+
+**Decisão 1: tentar usar o mesmo modelo de dados para tenants públicos e privados**
+
+No SGTU — sistema de gerenciamento de transporte universitário multi-tenant — começamos com o modelo padrão: cada tenant tem suas próprias entidades, acessíveis apenas ao seu contexto. O problema surgiu quando percebemos que dados precisavam cruzar fronteiras de tenant por razão regulatória: rotas intermunicipais, convênios entre instituições, dados de estudante que transitam entre vínculos diferentes.
+
+Dados que cruzam fronteiras de tenant em governo não são exceção — são padrão. Convênios federativos, políticas nacionais implementadas localmente, dados de cidadãos que transitam entre municípios. O modelo de "dado pertence ao tenant" não mapeia para essa realidade.
+
+A solução foi distinguir dados de configuração (que pertencem ao tenant e nunca cruzam fronteiras) de dados de domínio público (que têm visibilidade regulada e podem ser compartilhados entre tenants com autorização explícita, mantendo rastreabilidade do tenant de origem). A fronteira entre os dois não é sempre óbvia e precisa ser decidida explicitamente para cada entidade do domínio.
+
+**Decisão 2: RBAC sem contexto não resolve**
+
+O RBAC padrão — usuário tem roles, roles têm permissões — funciona bem quando "pode fazer X" não depende de contexto. Em governo, quase tudo depende de contexto.
+
+"Pode editar obra" — mas qual obra? Apenas obras do município em que está lotado, ou de todos os municípios conveniados? Apenas obras no status "em execução", ou também as finalizadas? Apenas obras criadas no seu mandato, ou as herdadas da gestão anterior?
+
+Cada uma dessas dimensões de contexto é uma regra de negócio com fundamento legal ou administrativo. O modelo RBAC simples não captura isso sem degeneração em um conjunto de roles específicos por caso de uso — que é tecnicamente equivalente a não ter abstração nenhuma.
+
+O que funciona é ABAC — controle de acesso baseado em atributos — onde a decisão de permissão é uma função de atributos do usuário, do recurso e do ambiente. É mais complexo de implementar e raciocinar, mas é o único modelo que acomoda a variabilidade de contexto que o domínio governamental exige.
+
+**Decisão 3: não planejar o log de auditoria como arquitetura desde o início**
+
+No CultBR — plataforma federativa de gestão cultural com 5.595 entes cadastrados — a camada de auditoria foi projetada depois que o modelo de dados já estava em produção. O resultado foi uma refatoração custosa: adicionar event sourcing retroativamente em tabelas com dados reais exige migração cuidadosa e testa a completude dos testes de integração de formas desconfortáveis.
+
+Log de auditoria não é middleware que você adiciona depois. É uma decisão que molda a escolha de padrão de persistência desde o início. Event sourcing como fundação resolve auditabilidade naturalmente; adicionar auditabilidade sobre persistência tradicional é remendo em cima de remendo.
+
+## O que isso implica para design de sistema
+
+Três princípios que emergiram dessas decisões:
+
+**Modelar quem é dono do dado, não apenas quem acessa.** Antes de definir controle de acesso, mapear: este dado pertence ao cidadão, ao ente público, ou à plataforma? A resposta muda o que pode ser feito com ele, por quanto tempo deve ser retido, e quem pode deletá-lo.
+
+**Log de auditoria é arquitetura, não feature.** Adicionar auditabilidade depois que o sistema está em produção é refatoração de toda a camada de persistência. Planejar o log de auditoria junto com o modelo de dados evita essa refatoração.
+
+**Tratar compliance como restrição arquitetural, não como checklist.** LGPD, Lei de Acesso à Informação, Lei de Licitações — não são documentos que o time jurídico revisa depois que o sistema está pronto. São restrições que modelam decisões de arquitetura desde a fase de design. A alternativa é descobrir a restrição em produção, com dado real de cidadão, com contrato assinado.
+
+## O que não é diferente
+
+Vale ser preciso sobre o que não muda: os fundamentos técnicos de isolamento de dados são os mesmos. Row-level security funciona. Schema-per-tenant funciona. Middleware de injeção de tenant_id funciona. A literatura de multitenancy SaaS é válida como base.
+
+O que é diferente são as premissas sobre propriedade de dado, soberania sobre exclusão, e fronteiras de acesso. Essas premissas determinam quais decisões arquiteturais têm consequências legais — e quais você descobre que errou apenas em produção.
+
+## O princípio que fica
+
+Multitenancy em governo não é multitenancy com mais compliance. É multitenancy onde as premissas fundamentais são diferentes desde o início.
+
+Aplicar o padrão B2B sem essas adaptações não é necessariamente errado — é arriscado de uma forma específica: a diferença não aparece durante o desenvolvimento nem nos primeiros meses de produção. Aparece quando um processo judicial pede auditoria, quando um gestor solicita relatório de acesso retroativo, ou quando um convênio entre municípios exige cruzamento de dados que a arquitetura não previu.
+
+Descobrir isso com contrato assinado e dado real de cidadão em produção é mais caro do que decidir com antecedência.
+
+---
+
+*Os padrões descritos emergiram de decisões de arquitetura no SGTU (Sistema de Gerenciamento do Transporte Universitário, implantado em Campo Alegre/AL) e no CultBR (plataforma de gestão cultural federativa com 5.595 entes), projetos da Requiem Company.*

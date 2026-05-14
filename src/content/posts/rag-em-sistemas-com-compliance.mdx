@@ -1,0 +1,76 @@
+---
+slug: "rag-em-sistemas-com-compliance"
+title: "RAG em sistemas com compliance não é RAG"
+excerpt: "A maioria dos tutoriais de RAG assume que você pode indexar os documentos e responder perguntas sobre eles. Quando o domínio é regulado — saúde, educação, governo — essa premissa quebra em cinco lugares diferentes."
+date: "2026-05-14"
+tags: ["IA Aplicada", "GovTech", "Arquitetura", "Engenharia de Software"]
+readTime: 8
+---
+
+O tutorial padrão de RAG tem uma estrutura elegante: você pega documentos, faz chunking, gera embeddings, armazena num vector store, e responde perguntas buscando os chunks mais similares como contexto. Funciona. A demonstração impressiona.
+
+O problema começa quando você leva isso para um domínio regulado.
+
+Trabalhando com sistemas em saúde (SGDI, rastreamento de dispositivos cardíacos no SUS), educação (SPTE, proteção de trajetória escolar), e governo federal (CultBR, política cultural com 5.595 entes), encontrei o mesmo conjunto de problemas com variações de domínio. A premissa que o tutorial não questiona — "você pode indexar os documentos e consultar" — colapsa quando os documentos têm titulares, quando o acesso é regulado por lei, ou quando a resposta precisa ser auditável.
+
+Não é que RAG não funcione nesses domínios. É que RAG nesses domínios é um problema diferente do tutorial.
+
+## O que o tutorial assume
+
+O pipeline padrão assume quatro coisas implicitamente:
+
+Que você é o único usuário ou que todos os usuários podem ver todos os documentos. Que os documentos não têm restrições de acesso internas. Que a resposta gerada não precisa de proveniência auditável — só precisa ser correta. E que indexar é idempotente: o mesmo documento indexado duas vezes produz o mesmo resultado, sem efeito colateral.
+
+Em contexto pessoal — suas notas, sua base de conhecimento, o que o Synapse Lab faz para um workspace individual — essas premissas são verdadeiras. Você é o titular dos dados que indexou. Você pode ver tudo que indexou. A LGPD, nesse caso, é simples: você é ao mesmo tempo controlador e titular.
+
+Quando o sistema tem múltiplos usuários com perfis de acesso diferentes, documentos com titulares distintos, e obrigação de log auditável, as quatro premissas quebram simultaneamente.
+
+## Onde o problema aparece em cada domínio
+
+**No SPTE** — sistema de proteção de trajetória escolar, vinculado ao MEC via TED 10974 — o corpus de documentos inclui fichas de avaliação de risco de evasão de estudantes menores de idade, com 46 itens do instrumento IAFREE-A cobrindo dimensões socioeconômicas, familiares, e de saúde.
+
+Esses dados têm titular com proteção especial: menor de idade, dado sensível (Art. 11 da LGPD), processado no âmbito de política pública educacional. O protocolo ético para uso em pesquisa exige aprovação do Comitê de Ética em Pesquisa da UFAL. Em produção, o acesso é restrito por perfil — o professor vê os estudantes da sua turma, o gestor municipal vê sua rede, o técnico do MEC vê agregados anonimizados.
+
+Num sistema RAG ingênuo: um professor faz uma pergunta sobre "estudantes em risco de evasão com fatores socioeconômicos críticos" — e o sistema busca por similaridade semântica em todo o corpus, sem considerar que o professor só pode ver seus próprios alunos. O resultado é uma violação de privacidade que a LGPD classifica como tratamento irregular de dados sensíveis de menor.
+
+O problema não é o modelo. É que o vector store não sabe quem está perguntando e o que essa pessoa pode ver.
+
+**No SGDI** — sistema de rastreamento de dispositivos cardíacos implantáveis no SUS, desenvolvido com o Hospital do Coração Alagoano — o corpus inclui histórico clínico de pacientes com dispositivos (marcapasso, CDI, ressincronizador), relatórios de telemetria, e documentação regulatória ANVISA (RDC 551/2021, SIUD).
+
+Sigilo médico tem fundamento no Código de Ética Médica, no CFM, e na LGPD. O dado de saúde é sensível por definição (Art. 11), com base legal restrita. Um técnico de manutenção de dispositivo pode acessar dados técnicos do equipamento sem acesso ao histórico clínico completo do paciente. Um cardiologista em outro hospital pode receber dados de telemetria via protocolo FHIR sem acesso ao prontuário local.
+
+O RAG que consulta "qual a condição atual do paciente X" precisa saber: quem pergunta, qual é a relação terapêutica, qual dado técnico é compartilhável vs qual é prontuário clínico, e o que o protocolo FHIR Device permite compartilhar interoperabilidade. Isso não é semântica — é controle de acesso baseado em atributos do contexto clínico.
+
+**No CultBR** — com dados de 5.595 entes federativos — a tensão é entre a Lei de Acesso à Informação (dados públicos por padrão) e o sigilo de informações internas de gestão. Um município pode ter documentos de planejamento que são públicos após homologação e restritos antes dela. Um diagnóstico de capacidade administrativa pode ser compartilhado entre entes conveniados mas não publicado sem autorização.
+
+Quando um sistema RAG indexa toda a base documental de todos os entes, a pergunta "qual foi o planejamento do município X para o exercício 2025" pode revelar documento que ainda estava em rascunho — status que o sistema de indexação não preservou porque chunk de texto não carrega metadado de estado de fluxo.
+
+## Os cinco problemas técnicos
+
+Do conjunto de domínios, emergem cinco problemas que o RAG padrão não endereça:
+
+**1. Controle de acesso na recuperação.** O vector store retorna os chunks mais similares à query. Sem filtragem por perfil de acesso do usuário que pergunta, a recuperação ignora quem pode ver o quê. A solução é filtrar por metadado de acesso antes ou durante a busca por similaridade — o que requer que o metadado de acesso esteja indexado junto com o conteúdo do chunk, e que o sistema saiba o perfil de acesso do usuário no momento da query.
+
+**2. Multi-tenant isolation no corpus.** Em sistemas com múltiplos tenants, a pergunta de um usuário do tenant A não deve recuperar chunks do tenant B, mesmo que semanticamente similares. A indexação precisa ser namespaced por tenant, e a query precisa ser scopada ao namespace correto. Vector stores modernos suportam isso via metadata filtering, mas exige design explícito — não emerge da implementação padrão.
+
+**3. Estado de documento como metadado crítico.** Documentos têm ciclo de vida: rascunho, revisão, aprovado, arquivado. Um chunk indexado de um documento em rascunho não pode ser recuperado como se fosse conteúdo aprovado. O estado do documento precisa ser preservado como metadado do chunk, e a query precisa filtrar por estado além de similaridade.
+
+**4. Auditabilidade da recuperação.** Em domínio regulado, não basta que a resposta seja correta — é necessário saber quais documentos foram recuperados, por quem, quando, e com qual query. Isso é log de auditoria de segunda ordem: não apenas "o usuário fez tal ação no sistema", mas "o sistema recuperou tais chunks para gerar tal resposta". Para fins jurídicos e de compliance, é a proveniência da resposta que importa, não só a resposta.
+
+**5. Dados que nunca devem ser indexados.** Alguns dados têm restrição de indexação independente de controle de acesso. Dados psicométricos brutos de instrumento validado (como os 46 itens do IAFREE-A por respondente individual) podem ser processados para gerar score de risco, mas o dado bruto não deve estar num vector store consultável por linguagem natural — a consulta semântica não tem granularidade suficiente para garantir que o instrumento foi aplicado corretamente no contexto da pergunta. A decisão de não indexar é uma decisão de arquitetura, não uma limitação.
+
+## O que muda no design
+
+Esses cinco problemas não são obstáculos que impedem RAG em domínio regulado — são restrições que moldam o design do pipeline.
+
+O pipeline resultante é mais complexo que o tutorial: o chunker precisa preservar metadados de acesso, estado e proveniência. O indexador precisa tratar namespace de tenant como primitiva de primeira classe. O retriever precisa filtrar por perfil de acesso antes de ranquear por similaridade. O logger precisa registrar a recuperação, não apenas a resposta. E a decisão sobre o que indexar precisa ser explícita para cada tipo de documento do domínio.
+
+Isso não é RAG com mais configuração. É uma arquitetura diferente que resolve um problema diferente.
+
+A distinção importa porque o pipeline do tutorial é fácil de implementar, fácil de demonstrar, e fácil de quebrar quando colocado em produção num domínio onde o dado tem titular, o acesso tem lei, e a resposta tem consequência.
+
+O tutorial cobre a mecânica. O domínio cobre os requisitos. A distância entre os dois é onde ficam os projetos que não deveriam ter ido para produção.
+
+---
+
+*Os casos descritos emergem de decisões de arquitetura no SPTE (Sistema de Proteção de Trajetórias Escolares, MEC/UFAL), SGDI (Sistema de Gestão de Dispositivos Implantáveis, Hospital do Coração Alagoano), CultBR (Ministério da Cultura), e Synapse Lab (Requiem Company). Cada domínio produziu variações do mesmo problema central.*

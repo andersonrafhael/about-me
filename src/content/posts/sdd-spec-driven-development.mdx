@@ -1,0 +1,92 @@
+---
+slug: "sdd-spec-driven-development"
+title: "SDD: o paradigma que estava faltando para engenharia com IA"
+excerpt: "TDD define quando testar. BDD define o que testar. Nenhum paradigma define quem especifica e quem implementa. Com agentes escrevendo código em produção, essa lacuna virou um problema real."
+date: "2026-05-14"
+tags: ["Engenharia de Software", "IA Aplicada", "Arquitetura", "Produto & Negócio"]
+readTime: 7
+---
+
+TDD define *quando* testar: antes do código. BDD define *o que* testar: o comportamento observável. São contribuições reais que mudaram como software é produzido.
+
+Nenhum dos dois define quem especifica e quem implementa.
+
+Enquanto o agente que implementava era outro engenheiro, isso não era problema. A divisão de trabalho emergia de dinâmica de time, review de PR, e conversa de corredor. Informal, mas funcionava.
+
+Com LLMs produzindo código em produção, a ausência de um paradigma formal para essa divisão virou um problema concreto. Não teórico. Concreto: sessions ad-hoc geram código que parece funcionar; sessions com estrutura clara geram código que funciona. A diferença entre os dois não é sutil.
+
+Chamamos o paradigma que formalizamos de SDD — Spec Driven Development.
+
+## O problema que a prática revelou
+
+O padrão que emerge sem disciplina é mais ou menos esse: o engenheiro descreve o que quer em linguagem natural, o agente produz código, o engenheiro revisa e pede ajustes, o ciclo se repete até o resultado parecer certo.
+
+O problema não está no ciclo — está em "parecer certo". Sem critério explícito de sucesso, a sessão termina quando o engenheiro fica satisfeito com o aspecto do código, não quando o código satisfaz os requisitos. São condições diferentes.
+
+O segundo problema é a ambiguidade na especificação. "Adicionar autenticação" é uma instrução que pode gerar desde JWT stateless até sessões em banco com refresh token e device fingerprinting. O agente não escolhe a alternativa mais sofisticada — escolhe a mais comum no seu corpus de treinamento. Que pode ou não ser o que o sistema precisa.
+
+O terceiro problema é o escopo: sem delimitar explicitamente o que está fora do escopo, o agente tende a adicionar tratamento de erro, validação, e abstração que não foram pedidos — e que introduzem complexidade que alguém vai manter depois.
+
+Esses três problemas têm a mesma causa raiz: ausência de separação formal entre *o que construir* e *como construir*.
+
+## As três fases do SDD
+
+SDD define três fases com responsáveis claros:
+
+**Specify** — o humano define o problema, as restrições e os critérios de sucesso. Nunca o *como*. Uma spec bem-formada tem exatamente três componentes: *Problem* (o que resolver e por que agora), *Constraints* (stack, convenções do projeto, escopo proibido), *Success criteria* (como sabemos que está pronto — testável, observável).
+
+**Execute** — o agente produz código, testes, migrations, configuração. Dirigido pela spec. Sem liberdade para expandir escopo além do que foi especificado.
+
+**Validate** — o humano revisa, verifica os critérios de sucesso, decide merge. Critério binário: a spec foi satisfeita ou não.
+
+A relação com TDD é de composição, não substituição. TDD opera dentro da fase Execute — o agente escreve teste antes do código, como seria esperado. SDD opera no nível acima: define quem especifica e quem implementa antes de qualquer teste existir.
+
+## A regra de ouro
+
+Se você não consegue escrever a spec, o agente não consegue escrever o código.
+
+Isso parece truísmo, mas tem consequência prática imediata: a incapacidade de especificar é um sinal de que o problema ainda não está entendido o suficiente para ser implementado. A solução não é passar a instrução vaga para o agente e ver o que emerge — é resolver o problema de entendimento primeiro.
+
+Em contextos de engenharia tradicional, a pressão para começar a codificar antes de entender o problema produz retrabalho. Em contextos com agente de IA, produz retrabalho com mais velocidade e mais confiança — o que é pior.
+
+## Task sizing como pré-fase
+
+Antes de entrar na fase Specify, SDD requer uma classificação de tamanho da task: XS (menos de 5 minutos, 1-2 arquivos), S (5-30 minutos, 3-5 arquivos), M (30 minutos a 2 horas, decisão arquitetural não-trivial), L (2 horas ou mais, múltiplas decisões arquiteturais).
+
+O tamanho da task determina quanto investimento em spec é proporcional. Uma task XS pode ter spec de duas linhas. Uma task M exige spec completa com Problem, Constraints e Success criteria detalhados. Uma task L exige spec por fase, com checkpoints de validação entre elas.
+
+Sem classificação prévia, o risco é usar o mesmo nível de investimento em spec para uma mudança de cor de botão e para uma migração de schema — o que é inefficiência em uma direção ou outra.
+
+## O que isso muda na prática
+
+No Requiem Forge — o framework interno que usamos como base para todos os projetos da Requiem Company — SDD está em produção desde fevereiro de 2026. Cinco projetos simultâneos, domínios distintos: transporte universitário municipal (SGTU), gestão cultural federativa (CultBR), mobilidade elétrica e OCPP (MicroRed), PKM com IA (Synapse Lab), sistema cardíaco hospitalar (SGDI).
+
+A diferença mais consistente entre sessions com spec formal e sessions ad-hoc não é velocidade de produção — é rework. Sessions ad-hoc geram ciclos de revisão que corrigi incrementalmente até o código convergir para o que era necessário. Sessions com spec clara tendem a convergir na primeira ou segunda iteração, com revisão de ajuste fino.
+
+O segundo efeito é na qualidade da comunicação entre sessões. Spec como artefato persistente significa que uma sessão pode continuar onde outra parou sem reconstruir contexto a partir do histórico de conversa. A spec é o contrato que sobrevive à sessão.
+
+## O que muda sobre senioridade
+
+O argumento mais importante do SDD não é técnico — é sobre o que define um engenheiro experiente.
+
+Na engenharia tradicional, senioridade correlaciona com velocidade de escrita de código bom. O engenheiro sênior produz mais, com menos bugs, em menos tempo. É uma definição razoável quando o gargalo é codificação.
+
+Quando agentes produzem código em velocidade de máquina, o gargalo deixa de ser codificação. Passa a ser especificação: a capacidade de decompor um problema de negócio em critérios de sucesso precisos, identificar as restrições que importam, e delimitar o escopo que não deve ser tocado.
+
+Sênior não é quem escreve código mais rápido. É quem escreve specs que agentes conseguem executar sem ambiguidade — e que humanos conseguem validar sem hesitação.
+
+Isso muda o que deve ser ensinado, o que deve ser avaliado em contratação, e o que deve ser desenvolvido em engenheiros júnior. A sintaxe da linguagem nunca foi o ponto. O domínio do problema sempre foi. Agora isso ficou mais difícil de ignorar.
+
+## O que o SDD não é
+
+SDD não é metodologia de gestão de projeto. Não define cerimônias, não define como equipes se organizam, não define ritmo de entrega.
+
+SDD não é ferramenta — é um paradigma: uma forma de pensar a divisão de trabalho entre humano e agente que pode ser implementada com qualquer ferramenta, em qualquer stack, em qualquer nível de autonomia do agente.
+
+E SDD não resolve o problema de especificação ruim. Se o Problem está mal definido, os Constraints estão incompletos, ou os Success criteria não são verificáveis — o agente vai executar a spec errada com precisão.
+
+A disciplina de especificação é trabalho humano. SDD apenas formaliza que ela precisa vir antes de qualquer linha de código — e que a qualidade do código que emerge é função direta da qualidade da spec que o precedeu.
+
+---
+
+*O paradigma SDD, a formalização das três fases, e a integração com task sizing foram concebidos a partir de prática real em engenharia de software. O Requiem Forge aplica SDD em produção desde fevereiro de 2026. Um paper formalizando o paradigma está em desenvolvimento para submissão acadêmica.*
