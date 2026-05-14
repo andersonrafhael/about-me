@@ -10,7 +10,7 @@
 # - Docker + Compose v2 instalados
 # - Traefik rodando na infra_sigma-network com certresolver letsencrypt
 # - Repo clonado em /opt/andersonrafhael:
-#     git clone https://github.com/andersonrafhael/site.git /opt/andersonrafhael
+#     git clone https://github.com/andersonrafhael/about-me.git /opt/andersonrafhael
 #
 # O que faz:
 #   1. Verifica DNS
