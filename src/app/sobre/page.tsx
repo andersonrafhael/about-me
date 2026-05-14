@@ -11,16 +11,20 @@ const stack = [
   { cat: "Frontend", items: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"] },
   { cat: "Backend", items: ["Django 5", "DRF", "PostgreSQL", "Supabase"] },
   { cat: "Infra", items: ["Docker", "Nginx", "Cloudflare", "VPS próprio"] },
-  { cat: "IA / ML", items: ["LLM APIs", "RAG", "Claude", "Python"] },
+  { cat: "IA / ML", items: ["LLM APIs", "RAG", "Claude API", "Python"] },
 ];
 
 const timeline = [
-  { year: "2022", event: "Fundei a Requiem Company em Maceió, AL" },
-  { year: "2022", event: "Primeiro contrato municipal — sistema de gestão urbana" },
-  { year: "2024", event: "Sigma em produção: 5+ municípios no Nordeste" },
-  { year: "2024", event: "SGTU: transporte escolar para prefeituras" },
-  { year: "2025", event: "CultBR, Synapse Lab, MicroRed — expansão do portfólio" },
-  { year: "2026", event: "Objetivo: Forbes Under 30 Brasil · Categoria Tecnologia" },
+  { year: "2021", event: "Início no NEES/UFAL — primeiro contato com sistemas reais de informação para governo" },
+  { year: "2022", event: "Fundei a Requiem Company em Maceió, AL — primeiro contrato municipal antes de concluir a graduação" },
+  { year: "2023", event: "Sigma em desenvolvimento — sistema de gestão urbana com georreferenciamento para prefeituras alagoanas" },
+  { year: "2024", event: "Sigma em produção: 5+ municípios no interior de Alagoas usando o sistema" },
+  { year: "2024", event: "SGTU lançado — gestão de transporte escolar multi-tenant para secretarias municipais" },
+  { year: "2024", event: "Primeiros papers aceitos em conferências internacionais (DGO, SBCAS)" },
+  { year: "2025", event: "CultBR, SGDI, Synapse Lab, MicroRed — expansão do portfólio para saúde, cultura e mobilidade" },
+  { year: "2025", event: "CultBR em produção: R$2,98bi em políticas culturais geridas na plataforma" },
+  { year: "2026", event: "Pipeline de pesquisa ativo: RMS (SBES), SGDI (SBCAS), MicroRed (IEEE Access)" },
+  { year: "2026", event: "Objetivo: Forbes Under 30 Brasil · Categoria Tecnologia & Inovação" },
 ];
 
 export default function SobrePage() {
@@ -62,21 +66,22 @@ export default function SobrePage() {
           </div>
           <div className="prose-custom">
             <p>
-              Engenheiro de software e fundador da{" "}
+              Engenheiro de computação e fundador da{" "}
               <a href="https://requiemcompany.com.br" target="_blank" rel="noopener noreferrer"
               className="text-foreground hover:text-primary transition-colors">Requiem Company</a>.
-              Construo infraestrutura digital para municípios brasileiros — sistemas que gestores públicos usam
-              para tomar decisões sobre sinalização viária, transporte escolar e gestão urbana.
+              Construo infraestrutura digital para municípios brasileiros — sistemas que gestores públicos
+              usam para tomar decisões sobre sinalização viária, transporte escolar, rastreabilidade de
+              dispositivos cardíacos e distribuição de recursos culturais.
             </p>
             <p>
-              Nasci em 29 de abril de 1998, cresci em Alagoas. Me formei em Engenharia da Computação pela UFAL.
-              Antes mesmo de concluir a graduação, já estava construindo sistemas que prefeituras alagoanas usariam
-              para gerir serviços públicos. Não esperei o diploma para começar.
+              Nasci em 29 de abril de 1998, cresci em Alagoas. Me formei em Engenharia da Computação
+              pela UFAL. Antes mesmo de concluir a graduação, já estava construindo sistemas que
+              prefeituras alagoanas usariam para gerir serviços públicos. Não esperei o diploma para começar.
             </p>
             <p>
-              Fora do eixo SP-RJ, acredito que tecnologia de qualidade não é privilégio de capital. Em 2022 fundei
-              a Requiem Company com um objetivo claro: infraestrutura digital densa, sem investimento externo,
-              com utilidade social real.
+              Fora do eixo SP-RJ. Acredito que tecnologia de qualidade não é privilégio de capital. Em
+              2022 fundei a Requiem Company com um objetivo claro: infraestrutura digital densa, sem
+              investimento externo, com utilidade social real. Cada contrato financiou o próximo.
             </p>
           </div>
         </section>
@@ -96,8 +101,15 @@ export default function SobrePage() {
             </p>
             <p>
               Transito entre engenharia de software, gestão de produto, gestão de projetos,
-              documentação/requisitos, atuação institucional e visão empresarial. Não sou
-              especialista em uma fatia — domino o sistema inteiro.
+              documentação técnica, atuação institucional e visão empresarial. Não sou especialista
+              em uma fatia — domino o sistema inteiro. Do levantamento de requisitos com secretários
+              municipais ao deploy em VPS próprio.
+            </p>
+            <p>
+              Paralelamente ao produto, faço pesquisa acadêmica no NEES/UFAL: engenharia de requisitos
+              formal, sistemas de informação para gestão pública, healthtech. 4 papers publicados em
+              conferências internacionais (DGO, SBCAS). Pipeline ativo para SBES 2026, SBCAS 2026 e
+              IEEE Access.
             </p>
           </div>
         </section>

@@ -40,7 +40,7 @@ export function WritingResearch() {
             <h2 className="font-headline font-bold text-fg-bright text-2xl tracking-[-0.02em]">
               Em breve<span className="text-primary">.</span>
             </h2>
-            <p className="text-[14px] text-foreground/55 leading-relaxed">
+            <p className="text-[14px] text-foreground/75 leading-relaxed">
               Artigos sobre engenharia aplicada ao setor público, produto
               e lições de quem constrói fora do eixo.
             </p>
@@ -49,10 +49,10 @@ export function WritingResearch() {
           <div className="flex flex-col gap-2.5 pt-3 border-t border-border/40">
             {plannedTopics.map((topic) => (
               <div key={topic} className="flex items-start gap-3">
-                <span className="font-mono text-[10px] text-foreground/55 mt-[3px] shrink-0">
+                <span className="font-mono text-[10px] text-foreground/60 mt-[3px] shrink-0">
                   —
                 </span>
-                <span className="text-[13px] text-foreground/60 leading-snug">
+                <span className="text-[13px] text-foreground/75 leading-snug">
                   {topic}
                 </span>
               </div>
@@ -100,7 +100,7 @@ export function WritingResearch() {
               RHEMA — Hierarchical Excellence Maturity Artifact
             </h3>
 
-            <p className="text-[14px] text-foreground/60 leading-relaxed">
+            <p className="text-[14px] text-foreground/75 leading-relaxed">
               Framework de requisitos verificáveis com maturidade cumulativa e
               degradação temporal. Aplicado em sistemas multi-tenant de gestão pública.
             </p>

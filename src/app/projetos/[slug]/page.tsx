@@ -51,11 +51,11 @@ export default async function ProjectPage({ params }: Props) {
               {status}
             </span>
             {tier === 2 && role && (
-              <span className="text-xs font-mono text-muted/60">{role}</span>
+              <span className="text-xs font-mono text-foreground/50">{role}</span>
             )}
           </div>
           <h1 className="font-headline text-4xl font-bold text-foreground">{name}</h1>
-          <p className="text-lg text-muted leading-relaxed">{tagline}</p>
+          <p className="text-lg text-foreground/80 leading-relaxed">{tagline}</p>
         </div>
 
         {/* Descrição */}
@@ -72,13 +72,13 @@ export default async function ProjectPage({ params }: Props) {
         <div className="layout-flow gap-3">
           <h2 className="text-xs font-mono text-muted uppercase tracking-widest">Stack</h2>
           <div className="glass-card rounded-xl p-4 font-mono text-sm">
-            <div className="text-muted/50 mb-2 text-xs">{`// ${name.toLowerCase()}.config`}</div>
+            <div className="text-foreground/30 mb-2 text-xs">{`// ${name.toLowerCase()}.config`}</div>
             <div className="layout-flow gap-1">
               {stack.map((tech, i) => (
                 <div key={tech} className="layout-cluster gap-2">
                   <span className="text-primary/60 select-none">{i === 0 ? "[" : " "}</span>
                   <span className="text-mint">&quot;{tech}&quot;</span>
-                  <span className="text-muted/40">{i < stack.length - 1 ? "," : "]"}</span>
+                  <span className="text-foreground/25">{i < stack.length - 1 ? "," : "]"}</span>
                 </div>
               ))}
             </div>

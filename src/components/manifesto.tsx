@@ -52,7 +52,7 @@ export function Manifesto() {
           <Link
             href="/sobre"
             className="inline-flex items-center gap-2 font-mono text-[13px]
-                       text-foreground/50 hover:text-primary transition-colors w-fit"
+                       text-foreground/65 hover:text-primary transition-colors w-fit"
           >
             Leia mais sobre mim →
           </Link>
@@ -78,7 +78,7 @@ export function Manifesto() {
               <span className="font-mono text-[11px] tracking-[0.14em] uppercase text-foreground/75">
                 {label}
               </span>
-              <span className="text-[12px] text-foreground/60 leading-snug">
+              <span className="text-[12px] text-foreground/75 leading-snug">
                 {detail}
               </span>
             </div>

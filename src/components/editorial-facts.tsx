@@ -6,22 +6,22 @@ const facts = [
   {
     n: "01",
     title: "Comecei antes do diploma.",
-    body: "Construí o primeiro sistema municipal antes de me formar em Engenharia da Computação pela UFAL.",
+    body: "Construí o primeiro sistema municipal antes de me formar em Engenharia da Computação pela UFAL. Não esperei a permissão formal para começar.",
   },
   {
     n: "02",
     title: "Bootstrap desde o início.",
-    body: "Nunca recebi capital externo. Cada contrato financiou o próximo.",
+    body: "Nunca recebi capital externo. Cada contrato financiou o próximo. Em produção: 5+ municípios, R$2,98bi em políticas culturais geridas.",
   },
   {
     n: "03",
     title: "Nordeste como escolha.",
-    body: "Base em Maceió, clientes em 5 municípios de Alagoas. Tecnologia de qualidade não é privilégio do eixo SP-RJ.",
+    body: "Base em Maceió. Clientes em municípios do interior de Alagoas. Tecnologia de qualidade não é privilégio do eixo SP-RJ — é uma questão de onde você decide construir.",
   },
   {
     n: "04",
-    title: "Não só software.",
-    body: "Gestão de produto, requisitos, atuação institucional, visão de negócio — domino o sistema inteiro, não só uma fatia.",
+    title: "Produto e pesquisa juntos.",
+    body: "4 papers publicados em conferências internacionais (DGO, SBCAS). Pipeline ativo para SBES 2026, SBCAS 2026 e IEEE Access. Código e ciência se alimentam.",
   },
 ];
 
@@ -61,7 +61,7 @@ export function EditorialFacts() {
               <h3 className="font-headline font-bold text-fg-bright text-[15px] leading-snug tracking-[-0.01em]">
                 {title}
               </h3>
-              <p className="text-[13px] text-foreground/55 leading-relaxed">
+              <p className="text-[13px] text-foreground/75 leading-relaxed">
                 {body}
               </p>
             </motion.div>
