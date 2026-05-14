@@ -30,8 +30,9 @@ export function Manifesto() {
             className="font-editorial italic text-fg-bright leading-[1.1] tracking-[-0.02em]"
             style={{ fontSize: "clamp(24px, 3.5vw, 44px)" }}
           >
-            &ldquo;Construo sistemas que gestores públicos usam para tomar
-            decisões reais — sobre gente, sobre cidade, sobre escola.&rdquo;
+            &ldquo;Construo sistemas de ponta para decisões que têm impacto
+            real — sobre operação, sobre pessoas, sobre o que não pode
+            falhar.&rdquo;
           </blockquote>
 
           <p className="text-[16px] text-foreground/65 leading-relaxed max-w-[55ch]">
@@ -45,8 +46,9 @@ export function Manifesto() {
               Requiem Company
             </a>{" "}
             em 2024 com um objetivo claro: infraestrutura digital de
-            excelência com densidade técnica e utilidade social real, fora do
-            eixo SP-RJ, sem capital externo.
+            excelência com densidade técnica e utilidade real — sem capital
+            externo. Produto e pesquisa caminham juntos — cada arquitetura é
+            também hipótese publicada.
           </p>
 
           <Link

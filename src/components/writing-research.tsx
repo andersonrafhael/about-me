@@ -25,7 +25,7 @@ export function WritingResearch() {
           className="glass-card rounded-xl p-7 flex flex-col gap-5"
         >
           <div className="flex items-center justify-between">
-            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/60">
+            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-primary">
               Escrita
             </p>
             <Link
@@ -73,7 +73,7 @@ export function WritingResearch() {
           className="glass-card rounded-xl p-7 flex flex-col gap-5"
         >
           <div className="flex items-center justify-between">
-            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-foreground/60">
+            <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-warning">
               Pesquisa
             </p>
             <Link

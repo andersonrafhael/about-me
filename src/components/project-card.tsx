@@ -23,10 +23,11 @@ export function ProjectCard({ project }: { project: Project }) {
 
   return (
     <motion.div
+      className="h-full"
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
     >
-      <Link href={`/projetos/${slug}`} className="block group">
+      <Link href={`/projetos/${slug}`} className="block group h-full">
         <article className="glass-card rounded-xl p-6 h-full layout-flow gap-4
                             hover:border-primary/30 transition-colors duration-200">
           {/* Header */}
