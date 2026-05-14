@@ -6,7 +6,7 @@ import { AvatarInitials } from "@/components/avatar-initials";
 export const metadata: Metadata = {
   title: "Sobre",
   description:
-    "Anderson Rafhael — fundador da Requiem Company e engenheiro de software. Construo infraestrutura digital que apoia gestão pública, políticas sociais e tomada de decisão com impacto real.",
+    "Anderson Rafhael, fundador da Requiem Company. Engenheiro de software construindo infraestrutura digital para gestão pública, políticas sociais e tomada de decisão.",
 };
 
 const stack = [

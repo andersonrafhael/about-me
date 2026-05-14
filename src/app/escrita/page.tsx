@@ -5,7 +5,7 @@ import { getAllPosts } from "@/lib/posts";
 export const metadata: Metadata = {
   title: "Escrita",
   description:
-    "Artigos e ensaios de Anderson Rafhael sobre infraestrutura digital pública, GovTech, engenharia de software, IA aplicada e construção de sistemas em domínios regulados.",
+    "Artigos de Anderson Rafhael sobre GovTech, engenharia de software, IA aplicada e sistemas em domínios regulados.",
 };
 
 export type Post = {
