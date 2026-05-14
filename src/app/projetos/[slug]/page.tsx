@@ -36,10 +36,10 @@ export default async function ProjectPage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen px-[clamp(24px,4.5vw,80px)] max-w-[1280px] mx-auto">
+    <div className="min-h-screen px-site max-w-[1280px] mx-auto">
 
       {/* ── Breadcrumb ── */}
-      <div className="pt-[calc(56px+clamp(40px,6vh,80px))] mb-16">
+      <div className="pt-page mb-16">
         <nav className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
                         flex items-center gap-2.5" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-foreground transition-colors text-muted">Início</Link>
@@ -97,7 +97,7 @@ export default async function ProjectPage({ params }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
-                       bg-primary text-white font-medium text-sm
+                       bg-primary text-primary-foreground font-medium text-sm
                        hover:bg-primary-deep transition-colors"
           >
             Ver projeto ao vivo

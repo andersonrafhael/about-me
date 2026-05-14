@@ -108,7 +108,7 @@ export function Hero() {
             <Link
               href="/projetos"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
-                         bg-primary text-white font-medium text-sm
+                         bg-primary text-primary-foreground font-medium text-sm
                          hover:bg-primary-deep transition-colors"
             >
               Ver projetos
