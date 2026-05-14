@@ -114,7 +114,9 @@ export function Nav() {
                        hover:text-foreground transition-colors group hidden sm:flex"
           >
             Requiem Company
-            <span className="text-[10px] text-muted-2 group-hover:text-primary
+            <span className="sr-only">(abre em nova aba)</span>
+            <span aria-hidden="true"
+                  className="text-[10px] text-muted-2 group-hover:text-primary
                              group-hover:translate-x-px group-hover:-translate-y-px
                              transition-transform inline-block">↗</span>
           </a>

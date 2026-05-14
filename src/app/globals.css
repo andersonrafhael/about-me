@@ -302,6 +302,18 @@
   .pt-page {
     padding-top: calc(56px + clamp(40px, 6vh, 80px));
   }
+  /* Rótulo mono padrão — seções de sidebar e breadcrumbs */
+  .mono-label {
+    @apply font-mono uppercase text-muted;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+  /* Sub-rótulo mono menor — labels internos de seções */
+  .mono-sublabel {
+    @apply font-mono uppercase text-muted;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
 }
 
 @media print, (prefers-reduced-motion: reduce) {

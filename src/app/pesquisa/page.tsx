@@ -94,8 +94,7 @@ export default function PesquisaPage() {
 
       {/* ── Breadcrumb ── */}
       <div className="pt-page mb-16">
-        <nav className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                        flex items-center gap-2.5" aria-label="Breadcrumb">
+        <nav className="mono-label flex items-center gap-2.5" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-foreground transition-colors text-muted">Início</Link>
           <span className="text-muted-2">/</span>
           <span className="text-foreground font-medium">Pesquisa</span>
@@ -121,8 +120,7 @@ export default function PesquisaPage() {
 
         {/* Pipeline — em submissão / andamento */}
         <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
+          <div className="mono-label sticky top-[calc(56px+16px)] h-fit">
             Pipeline
           </div>
           <div className="flex flex-col gap-10">
@@ -163,8 +161,7 @@ export default function PesquisaPage() {
 
         {/* Publicações anteriores */}
         <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
+          <div className="mono-label sticky top-[calc(56px+16px)] h-fit">
             Publicações
           </div>
           <div className="flex flex-col gap-6">
@@ -193,8 +190,7 @@ export default function PesquisaPage() {
 
         {/* Interesses */}
         <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
+          <div className="mono-label sticky top-[calc(56px+16px)] h-fit">
             Interesses
           </div>
           <ul className="flex flex-col gap-3">
@@ -211,31 +207,30 @@ export default function PesquisaPage() {
 
         {/* Afiliação */}
         <section className="section-grid py-[clamp(48px,7vh,88px)]">
-          <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                          sticky top-[calc(56px+16px)] h-fit">
+          <div className="mono-label sticky top-[calc(56px+16px)] h-fit">
             Afiliação
           </div>
           <div className="flex flex-col gap-5 text-[15px] text-foreground">
             <div>
-              <span className="font-mono text-[10px] text-muted tracking-[0.14em] uppercase block mb-1">
+              <span className="mono-sublabel block mb-1">
                 Instituição
               </span>
               Universidade Federal de Alagoas (UFAL)
             </div>
             <div>
-              <span className="font-mono text-[10px] text-muted tracking-[0.14em] uppercase block mb-1">
+              <span className="mono-sublabel block mb-1">
                 Núcleo
               </span>
               NEES — Núcleo de Excelência em Engenharia de Software
             </div>
             <div>
-              <span className="font-mono text-[10px] text-muted tracking-[0.14em] uppercase block mb-1">
+              <span className="mono-sublabel block mb-1">
                 Graduação
               </span>
               Engenharia da Computação — Bacharelado
             </div>
             <div>
-              <span className="font-mono text-[10px] text-muted tracking-[0.14em] uppercase block mb-1">
+              <span className="mono-sublabel block mb-1">
                 Currículo Lattes
               </span>
               <a
