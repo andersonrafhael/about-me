@@ -95,7 +95,11 @@ export function ConstellationCanvas() {
     init();
     resize();
     window.addEventListener("resize", resize);
-    reducedMotion ? tick() : (raf = requestAnimationFrame(tick));
+    if (reducedMotion) {
+      tick();
+    } else {
+      raf = requestAnimationFrame(tick);
+    }
 
     return () => {
       cancelAnimationFrame(raf);
