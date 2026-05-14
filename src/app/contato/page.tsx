@@ -52,7 +52,7 @@ export default function ContatoPage() {
       </div>
 
       {/* ── Title block ── */}
-      <div className="grid grid-cols-[1fr_auto] items-end gap-8 mb-[clamp(56px,8vh,96px)]
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] items-end gap-4 sm:gap-8 mb-[clamp(56px,8vh,96px)]
                       pb-[clamp(40px,5vh,64px)] border-b border-border">
         <h1 className="editorial-title">
           Contato<span className="punct">.</span>

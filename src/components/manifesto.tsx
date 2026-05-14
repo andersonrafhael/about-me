@@ -12,7 +12,7 @@ const markers = [
 export function Manifesto() {
   return (
     <section className="section-outer">
-      <div className="max-w-[1440px] mx-auto grid lg:grid-cols-[1fr_360px] gap-16 lg:gap-24 items-center">
+      <div className="max-w-[1440px] mx-auto grid lg:grid-cols-[1fr_360px] gap-8 lg:gap-24 items-center">
 
         {/* Esquerda — texto editorial */}
         <motion.div
