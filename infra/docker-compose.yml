@@ -1,0 +1,25 @@
+services:
+  app:
+    build: ..
+    container_name: andersonrafhael
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.andersonrafhael.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.andersonrafhael.entrypoints=websecure"
+      - "traefik.http.routers.andersonrafhael.tls=true"
+      - "traefik.http.routers.andersonrafhael.tls.certresolver=letsencrypt"
+      - "traefik.http.services.andersonrafhael.loadbalancer.server.port=3000"
+      - "traefik.http.routers.andersonrafhael-http.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.andersonrafhael-http.entrypoints=web"
+      - "traefik.http.routers.andersonrafhael-http.middlewares=andersonrafhael-https@docker"
+      - "traefik.http.middlewares.andersonrafhael-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.andersonrafhael-https.redirectscheme.permanent=true"
+    networks:
+      - infra_sigma-network
+
+networks:
+  infra_sigma-network:
+    external: true
