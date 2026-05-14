@@ -181,7 +181,7 @@
     color: var(--color-fg-dim);
     max-width: 65ch;
   }
-  .prose-custom p { color: #c8c5d0; }
+  .prose-custom p { color: var(--color-fg-dim); }
   .prose-custom a { color: var(--color-foreground); transition: color 0.2s; }
   .prose-custom a:hover { color: var(--color-primary); }
 
@@ -298,6 +298,9 @@
   }
   .px-site {
     padding-inline: clamp(24px, 4.5vw, 80px);
+  }
+  .pt-page {
+    padding-top: calc(56px + clamp(40px, 6vh, 80px));
   }
 }
 

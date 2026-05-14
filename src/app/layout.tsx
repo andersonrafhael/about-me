@@ -2,6 +2,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import { Nav } from "@/components/nav";
+import { Providers } from "@/components/providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -64,8 +65,18 @@ export default function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <body>
-        <Nav />
-        <main className="pt-14">{children}</main>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-9999
+                     focus:px-4 focus:py-2 focus:bg-void focus:text-foreground focus:rounded-lg
+                     focus:border focus:border-border focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          Ir para o conteúdo principal
+        </a>
+        <Providers>
+          <Nav />
+          <main id="main-content" className="pt-14">{children}</main>
+        </Providers>
       </body>
     </html>
   );

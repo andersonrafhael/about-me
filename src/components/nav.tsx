@@ -77,6 +77,15 @@ export function Nav() {
   const time = useBRTClock();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 nav-glass">
       <nav
@@ -156,10 +165,11 @@ export function Nav() {
           {/* Mobile toggle */}
           <button
             data-open={menuOpen}
-            className="group md:hidden flex flex-col gap-1.5 p-2 text-muted hover:text-foreground transition-colors"
+            className="group md:hidden flex flex-col gap-1.5 p-2.5 text-muted hover:text-foreground transition-colors"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
             aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
             <span className="block w-5 h-px bg-current transition-transform group-data-[open=true]:rotate-45 group-data-[open=true]:translate-y-[7px]" />
             <span className="block w-5 h-px bg-current transition-opacity group-data-[open=true]:opacity-0" />
@@ -170,7 +180,7 @@ export function Nav() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden nav-glass border-t border-border/40">
+        <div id="mobile-menu" className="md:hidden nav-glass border-t border-border/40">
           <ul className="flex flex-col list-none px-6 py-4 gap-1">
             {links.map(({ href, label, n }) => {
               const active = pathname === href || pathname?.startsWith(href + "/");
