@@ -126,9 +126,10 @@ export const projects: Project[] = [
     role: "Gerente de Produto — NEES/UFAL",
     tagline: "Governança institucional para a política cultural brasileira.",
     description:
-      "Plataforma de gestão administrativa e governança institucional para entidades culturais públicas no âmbito da Política Nacional de Aldir Blanc (PNAB). Gerencia fluxos de R$2,98 bilhões em políticas culturais federais. Anderson atua como Gerente de Produto no NEES/UFAL, conduzindo requisitos, gestão do ciclo de lançamento e articulação com o Ministério da Cultura.",
+      "Plataforma de gestão administrativa e governança institucional para entidades culturais públicas no âmbito da Política Nacional de Aldir Blanc (PNAB). Gerencia fluxos de R$2,98 bilhões em políticas culturais federais. No ar em domínio federal do Ministério da Cultura (cultbr.cultura.gov.br). Anderson atua como Gerente de Produto no NEES/UFAL, conduzindo requisitos, gestão do ciclo de lançamento e articulação com o Ministério da Cultura.",
     stack: ["Next.js", "Django", "Supabase", "PostgreSQL"],
-    metrics: "R$2,98bi em políticas culturais · Ministério da Cultura",
+    metrics: "Ao vivo em cultbr.cultura.gov.br · R$2,98bi em políticas culturais (PNAB) · Ministério da Cultura",
+    url: "https://cultbr.cultura.gov.br",
   },
   {
     slug: "tela-brasil",
@@ -139,8 +140,9 @@ export const projects: Project[] = [
     role: "Gerente de Produto — NEES/UFAL",
     tagline: "Plataforma audiovisual pública — acesso, acessibilidade e cultura.",
     description:
-      "Plataforma de distribuição de conteúdo audiovisual público com foco em acessibilidade (libras, audiodescrição, legendas) e políticas culturais. Parceria com o Ministério da Cultura no contexto da democratização do acesso ao audiovisual brasileiro. Anderson atua como Gerente de Produto, coordenando requisitos de acessibilidade e conformidade com WCAG 2.2 e políticas do MinC.",
+      "Plataforma de distribuição de conteúdo audiovisual público com foco em acessibilidade (libras, audiodescrição, legendas) e políticas culturais. No ar em domínio federal do Ministério da Cultura (telabrasil.cultura.gov.br), no contexto da democratização do acesso ao audiovisual brasileiro. Anderson atua como Gerente de Produto, coordenando requisitos de acessibilidade e conformidade com WCAG 2.2 e políticas do MinC.",
     stack: ["Next.js", "Django", "Supabase"],
-    metrics: "Ministério da Cultura · acessibilidade WCAG 2.2",
+    metrics: "Ao vivo em telabrasil.cultura.gov.br · acessibilidade WCAG 2.2 (libras, audiodescrição) · Ministério da Cultura",
+    url: "https://telabrasil.cultura.gov.br",
   },
 ];
