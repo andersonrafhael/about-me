@@ -1,6 +1,6 @@
 # MEMORY — andersonrafhael.requiemcompany.com.br
 
-> Atualizado: 2026-08-21 · Branch: main · Forge 6.8.0 (starter pack local, gitignored — repo público)
+> Atualizado: 2026-08-21 · Branch: `redesign/2026-08-vitrine` (PR #1 → main: https://github.com/andersonrafhael/about-me/pull/1) · Forge 6.8.0 (starter pack local, gitignored — repo público)
 
 ## Estado
 
@@ -8,7 +8,7 @@ Redesign completo entregue em 2026-08-21 (task L, design doc em `docs/plans/2026
 Site buildado, gauntlet de qualidade como contrato de terminação Classe A (`scripts/gauntlet/check.mjs`,
 thresholds em `scripts/gauntlet/thresholds.json`, contrato em `docs/plans/2026-08-21-redesign/loop-contract.json`).
 
-**Bloqueio externo (ação do Anderson):** o registro DNS `andersonrafhael` não existe na zona Cloudflare de
+**Bloqueio externo (ação do Anderson):** (0) mesclar o PR #1 — o hook `main-push-guard` veda push de IA em `main`; (1) o registro DNS `andersonrafhael` não existe na zona Cloudflare de
 `requiemcompany.com.br`; o VPS responde 200 via `--resolve`. SSH do Mac não é aceito pelo VPS (chaves
 `id_ed25519`/`id_rsa` recusadas para root). Runbook: `docs/runbook.md`. Deploy por Action exige secrets
 `VPS_HOST`, `VPS_SSH_KEY` e `VPS_KNOWN_HOSTS` (obrigatório; sem `ssh-keyscan`), opcional `VPS_IP`. A Action chama `infra/deploy.sh`.

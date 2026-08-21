@@ -22,7 +22,7 @@ Critérios de saída declarativos e machine-checkable.
 | 7 | Tela Brasil ausente do site (trava jurídica) | `! grep -ril 'tela brasil' src/data src/app src/components` | `exit 0` |
 | 8 | Nenhum domínio morto linkado | `! grep -rE 'https://(www\.)?requiemcompany\.com\.br|rhema\.requiemcompany' src` | `exit 0` |
 | 9 | Slug `sgtu` redireciona para `unipass` | `grep -q 'unipass' next.config.ts && grep -q 'sgtu' next.config.ts` | `exit 0` |
-| 10 | Push feito (main local == origin/main) | `test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/main \| cut -f1)"` | `exit 0` |
+| 10 | Trabalho publicado para revisão humana (branch + PR; o hook `main-push-guard` do Forge veda push direto em `main`) | `test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/redesign/2026-08-vitrine \| cut -f1)" && gh pr view 1 --json state -q .state \| grep -q OPEN` | `exit 0` |
 
 ## Verify All
 
@@ -36,7 +36,7 @@ npx playwright test && \
 ! grep -ril 'tela brasil' src/data src/app src/components && \
 ! grep -rE 'https://(www\.)?requiemcompany\.com\.br|rhema\.requiemcompany' src && \
 grep -q 'unipass' next.config.ts && grep -q 'sgtu' next.config.ts && \
-test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/main | cut -f1)" && \
+test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/redesign/2026-08-vitrine | cut -f1)" && \
 echo "ALL OUTCOMES PASS"
 ```
 

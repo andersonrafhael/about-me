@@ -11,7 +11,7 @@ plan-ref: "docs/plans/2026-08-21-redesign/plan.md"
 
 | Check                     | Resultado                                                                                                                                        |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Commits no branch         | trabalho feito direto em `main` (repo pessoal, sem PR); commits temáticos no fim da sessão — ver §Decisão                                        |
+| Commits no branch         | 9 commits temáticos em `redesign/2026-08-vitrine` (`git log --oneline main..HEAD \| wc -l` = 9); PR #1 para `main`                                |
 | Fases do plano concluídas | 0–6 concluídas; 7 (validate) concluída com este arquivo + `fresh-review.md` + `ux-verify.md`; 8 (ship) até o `push` — deploy depende do Anderson |
 
 ## Quality Gate
@@ -54,7 +54,7 @@ npm run quality   # tsc --noEmit && eslint . --max-warnings 0 && next build
 | Imagem Docker de produção | Sim — `docker build` OK (node:22-alpine, standalone); container respondeu 200 em `/`, `/projetos/sigma`, `/sitemap.xml`, `/feed.xml`, `/manifest.webmanifest`, `/opengraph-image`; removida após o teste. Build anterior ao `HEALTHCHECK` adicionado depois (busybox `wget`, baixo risco) | `/tmp/docker-build.log` |
 | Revisão em contexto limpo             | [PREENCHER: veredito de `fresh-review.md`]                                           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Validação e2e (qa-engineer)           | [PREENCHER: decisão de `ux-verify.md`]                                               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| Push feito                            | [PREENCHER]                                                                          | `git rev-parse HEAD` = `origin/main`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Publicado para revisão | Sim — branch `redesign/2026-08-vitrine` (9 commits) em `origin`; **PR #1** aberto: https://github.com/andersonrafhael/about-me/pull/1. Push direto em `main` bloqueado pelo hook `main-push-guard` (regra: diff de IA revisado por humano antes da main) — comportamento correto, não contornado | `git ls-remote origin` |
 
 ## Revisão em contexto limpo — o que foi tratado
 
@@ -110,4 +110,4 @@ npm run quality   # tsc --noEmit && eslint . --max-warnings 0 && next build
 
 **Status: PARTIAL**
 
-Motivo: tudo o que é observável localmente passou (gate mecânico, gauntlet, e2e). "Site no ar na URL pública" não é observável nesta sessão — depende de dois passos do Anderson (registro DNS na Cloudflare e primeiro deploy por SSH/Action), documentados em `docs/runbook.md`. Ao executá-los, o critério fecha com `curl -sI https://andersonrafhael.requiemcompany.com.br` → 200 e uma rodada do gauntlet apontada para a URL pública.
+Motivo: tudo o que é observável localmente passou (gate mecânico, gauntlet rodada 6, e2e, Docker). "Site no ar na URL pública" não é observável nesta sessão — depende de três passos do Anderson: revisar e mesclar o PR #1, criar o registro DNS na Cloudflare e disparar o primeiro deploy (SSH ou secrets da Action), documentados em `docs/runbook.md`. Ao executá-los, o critério fecha com `curl -sI https://andersonrafhael.requiemcompany.com.br` → 200 e uma rodada do gauntlet apontada para a URL pública.
