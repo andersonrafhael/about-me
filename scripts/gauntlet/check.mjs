@@ -90,16 +90,37 @@ try {
 } catch {}
 
 log(`▶ serve ${BASE}`);
+startServer();
+}
 // wrangler dev serves out/ exactly like Workers static assets in production:
 // _headers, _redirects, html_handling and 404.html are all honoured.
-server = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1"], {
-  cwd: root,
-  stdio: ["ignore", "pipe", "pipe"],
-  detached: true, // own process group — see stopServer()
-  env: { ...process.env, NODE_ENV: "production" },
-});
-server.stdout.on("data", (d) => (serverLog += d));
-server.stderr.on("data", (d) => (serverLog += d));
+function startServer() {
+  server = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1"], {
+    cwd: root,
+    stdio: ["ignore", "pipe", "pipe"],
+    detached: true, // own process group — see stopServer()
+    env: { ...process.env, NODE_ENV: "production" },
+  });
+  server.stdout.on("data", (d) => (serverLog += d));
+  server.stderr.on("data", (d) => (serverLog += d));
+  server.on("exit", (code, signal) => (serverLog += `\n[gauntlet] wrangler dev exited (code ${code}, signal ${signal})\n`));
+}
+// wrangler dev's proxy layer occasionally drops its connection to workerd under
+// Lighthouse/Playwright load and the process exits ("Network connection lost").
+// The site is not at fault, so the run restarts the server instead of failing
+// every remaining check with ECONNREFUSED; each restart is reported as a warning.
+let restarts = 0;
+async function ensureServer(phase) {
+  if (REMOTE) return;
+  try {
+    const r = await fetch(BASE + "/", { signal: AbortSignal.timeout(5000) });
+    if (r.ok) return;
+  } catch {}
+  restarts += 1;
+  warn("server", `wrangler dev stopped answering before ${phase}; restart #${restarts}`);
+  stopServer();
+  startServer();
+  await waitFor(BASE + "/");
 }
 log(`▶ target ${BASE}`);
 process.on("exit", stopServer);
@@ -156,6 +177,7 @@ process.on("uncaughtException", (err) => { writePartial(err); stopServer(); cons
 process.on("unhandledRejection", (err) => { writePartial(err); stopServer(); console.error("✗ aborted:", err); process.exit(1); });
 for (const route of routes) {
   const url = BASE + route;
+  await ensureServer(`route ${route}`);
   for (const [vpName, vp] of Object.entries(viewports)) {
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
@@ -306,6 +328,7 @@ await browser.close();
 // ───────────────────────── 3. links ─────────────────────────
 log(`▶ links: ${internalLinks.size} internal, ${externalLinks.size} external`);
 const linkReport = { internal: {}, external: {} };
+await ensureServer("links");
 for (const [p, from] of internalLinks) {
   try {
     const r = await fetch(BASE + p, { redirect: "follow" });
@@ -339,6 +362,7 @@ for (const [href, from] of externalLinks) {
 
 // ───────────────────────── 4. extra urls ─────────────────────────
 const extraReport = {};
+await ensureServer("extra urls");
 for (const p of T.extraUrls ?? []) {
   try {
     const r = await fetch(BASE + p);
@@ -389,6 +413,7 @@ if (!SKIP.has("lighthouse")) {
     for (const ff of ["mobile", "desktop"]) {
       const url = BASE + route;
       let res;
+      await ensureServer(`lighthouse ${route} [${ff}]`);
       try {
         // performance é ruidosa: duas execuções sempre, fica a PIOR (gate conservador,
         // sem viés para cima — o retry só-quando-falha inflava o resultado)
