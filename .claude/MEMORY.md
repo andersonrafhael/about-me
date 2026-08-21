@@ -8,10 +8,28 @@ Redesign completo entregue em 2026-08-21 (task L, design doc em `docs/plans/2026
 Site buildado, gauntlet de qualidade como contrato de terminação Classe A (`scripts/gauntlet/check.mjs`,
 thresholds em `scripts/gauntlet/thresholds.json`, contrato em `docs/plans/2026-08-21-redesign/loop-contract.json`).
 
-**Bloqueio externo (ação do Anderson):** (0) mesclar o PR #1 — o hook `main-push-guard` veda push de IA em `main`; (1) o registro DNS `andersonrafhael` não existe na zona Cloudflare de
-`requiemcompany.com.br`; o VPS responde 200 via `--resolve`. SSH do Mac não é aceito pelo VPS (chaves
-`id_ed25519`/`id_rsa` recusadas para root). Runbook: `docs/runbook.md`. Deploy por Action exige secrets
-`VPS_HOST`, `VPS_SSH_KEY` e `VPS_KNOWN_HOSTS` (obrigatório; sem `ssh-keyscan`), opcional `VPS_IP`. A Action chama `infra/deploy.sh`.
+**Infra — estado em 2026-08-21 (pós-merge do PR #1, `origin/main` = f5655b7):**
+
+- A Action "Deploy" falha por desenho: os secrets `VPS_HOST`/`VPS_SSH_KEY`/`VPS_KNOWN_HOSTS` não existem. O
+  caminho VPS+Traefik (`infra/`, `docs/runbook.md`) continua válido, mas é o caminho **errado** para este site:
+  o VPS Traefik já não serve `sigma`/`unipass` (404 via `--resolve`), e o DevOps Core está com os quatro
+  provedores (Cloudflare, NPM, Portainer, Umbler) **não configurados** — não publica DNS nem rota hoje, e aponta
+  para outro VPS/proxy (NPM). O conector Cloudflare do claude.ai exige OAuth interativo (indisponível aqui).
+- **Caminho canônico descoberto:** os irmãos `sigma.requiemcompany.com.br` (`sigma/sigma-site/site-v2`) e
+  `requiem-company-site` são Cloudflare Workers static assets com `routes: [{ pattern, custom_domain: true }]`
+  — o `wrangler deploy` cria o DNS sozinho. A sessão OAuth do wrangler neste Mac está válida (conta do
+  Anderson; escopos `workers (write)`, `workers_routes (write)`, `zone (read)`, `ssl_certs (write)`) — é
+  credencial do SO, nunca do repositório.
+- **Próxima sessão (task M, nova branch):** migrar para `output: "export"` + `wrangler.jsonc`
+  (`name: andersonrafhael-site`, `assets.directory: ./out`, `not_found_handling: "404-page"`,
+  `routes: [{ pattern: "andersonrafhael.requiemcompany.com.br", custom_domain: true }]`). Implicações do export:
+  `headers()`/`redirects()` do `next.config.ts` viram `public/_headers` e `public/_redirects` (CSP e 308
+  `/projetos/sgtu` → `/projetos/unipass`); `images.unoptimized: true` (WebP já ≤ 90 KB) ou loader custom;
+  os `opengraph-image.tsx` de `[slug]` precisam sair como estáticos (hoje são ƒ por lerem fonte via `fs` em
+  request-time — exportar `generateStaticParams`/`dynamic = "force-static"` ou pré-gerar PNGs no build);
+  gauntlet passa a servir `out/` (`npx wrangler dev` ou servidor estático). Depois: `npx wrangler deploy`,
+  `node scripts/gauntlet/check.mjs --base=https://andersonrafhael.requiemcompany.com.br`, remover
+  `infra/` + Action de SSH (ou trocar por `wrangler deploy` com secret `CLOUDFLARE_API_TOKEN` escopado).
 
 ## Arquitetura do site (pós-redesign)
 
