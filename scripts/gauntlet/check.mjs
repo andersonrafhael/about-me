@@ -413,11 +413,16 @@ if (!SKIP.has("lighthouse")) {
     for (const ff of ["mobile", "desktop"]) {
       const url = BASE + route;
       let res;
-      await ensureServer(`lighthouse ${route} [${ff}]`);
       try {
         // performance é ruidosa: duas execuções sempre, fica a PIOR (gate conservador,
         // sem viés para cima — o retry só-quando-falha inflava o resultado)
+        // wrangler dev stops answering right after a Lighthouse run tears Chrome
+        // down (last request served: the manifest icon), so every run gets a
+        // probed — and if needed restarted — server; otherwise the 2nd run
+        // measures a hung server and LCP/TBT explode.
+        await ensureServer(`lighthouse ${route} [${ff}] run 1`);
         const a1 = runLh(url, ff, 1);
+        await ensureServer(`lighthouse ${route} [${ff}] run 2`);
         const a2 = runLh(url, ff, 2);
         res = a1.scores.performance <= a2.scores.performance ? a1 : a2;
         res.metrics = {
