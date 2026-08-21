@@ -4,7 +4,7 @@ Site pessoal de [Anderson Rafhael](https://andersonrafhael.requiemcompany.com.br
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · MDX · Docker standalone atrás de Traefik.
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · MDX · export estático em Cloudflare Workers (static assets).
 
 Sem CMS, sem analytics, sem cookies. Conteúdo vive em `src/data/*.ts` (projetos, site, pesquisa) e `src/content/posts/*.mdx` (artigos).
 
@@ -13,7 +13,8 @@ Sem CMS, sem analytics, sem cookies. Conteúdo vive em `src/data/*.ts` (projetos
 ```bash
 npm install
 npm run dev            # http://localhost:3000
-npm run quality        # tsc + eslint + build
+npm run quality        # tsc + eslint + build (export estático em out/)
+npm run preview        # serve out/ com wrangler dev em :3001 (headers, redirects e 404 como em produção)
 npm run gauntlet       # build + Lighthouse + axe + contrato HTML/SEO + teclado + links
 ```
 
@@ -21,7 +22,7 @@ O gauntlet (`scripts/gauntlet/check.mjs`) é a barra mecânica do site: Lighthou
 
 ## Deploy
 
-`docs/runbook.md` — DNS (Cloudflare), deploy manual (`infra/deploy.sh`), deploy por GitHub Action (`.github/workflows/deploy.yml`), rollback e verificação.
+Cloudflare Workers static assets com custom domain — o `wrangler deploy` cria o DNS. `docs/runbook.md` — arquitetura, deploy manual (`npm run deploy`), deploy por GitHub Action (`.github/workflows/deploy.yml`), rollback e verificação.
 
 ## Licença
 

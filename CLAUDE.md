@@ -1,6 +1,6 @@
 # andersonrafhael.requiemcompany.com.br
 
-Site pessoal de Anderson Rafhael — vitrine de produtos, escrita e pesquisa. Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind v4 (CSS-first, `@theme inline`) · MDX nativo. Deploy: Docker standalone atrás do Traefik no VPS (`infra/`).
+Site pessoal de Anderson Rafhael — vitrine de produtos, escrita e pesquisa. Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind v4 (CSS-first, `@theme inline`) · MDX nativo. Deploy: `output: "export"` servido por Cloudflare Workers static assets com custom domain (`wrangler.jsonc`; headers em `public/_headers`, redirects em `public/_redirects`).
 
 @AGENTS.md
 
@@ -9,10 +9,10 @@ Site pessoal de Anderson Rafhael — vitrine de produtos, escrita e pesquisa. Ne
 | Ação                               | Comando                                                                                                                                         |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dev                                | `npm run dev` (webpack; ver `package.json`)                                                                                                     |
-| Qualidade (gate)                   | `npm run quality` — tsc + eslint + build                                                                                                        |
-| E2E                                | `npm test` (Playwright, sobe o dev server em :3001)                                                                                             |
+| Qualidade (gate)                   | `npm run quality` — tsc + eslint + build (export estático em `out/`)                                                                            |
+| E2E                                | `npm test` (Playwright; serve `out/` com `wrangler dev` em :3001 — `npm run preview` faz o mesmo à mão)                                        |
 | Gauntlet (barra mecânica completa) | `node scripts/gauntlet/check.mjs` — Lighthouse + axe + contrato HTML/SEO + teclado + links; relatório em `scripts/gauntlet/reports/latest.json` |
-| Deploy                             | `VPS_HOST=user@host bash infra/deploy.sh` (pull + `docker compose up --build`)                                                                  |
+| Deploy                             | `npm run deploy` (`next build && wrangler deploy`; exige `wrangler login`) — runbook em `docs/runbook.md`; rollback: `wrangler rollback`        |
 
 ## Fonte de verdade do conteúdo
 
