@@ -3,6 +3,9 @@ import { projects } from "@/data/projects";
 import { now, site } from "@/data/site";
 import { getAllPosts } from "@/lib/posts";
 
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const updatedAt = new Date(now.updatedAt);
 

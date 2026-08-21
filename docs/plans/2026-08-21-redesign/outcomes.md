@@ -17,7 +17,7 @@ Critérios de saída declarativos e machine-checkable.
 | 2 | Barra do gauntlet (Lighthouse, axe, HTML/SEO, teclado, links) | `node scripts/gauntlet/check.mjs` | `exit 0` |
 | 3 | Contrato de loop válido | `python3 ~/Desktop/Antigravity/requiem-forge/scripts/loop-contract-validate.py docs/plans/2026-08-21-redesign/loop-contract.json --repo-root .` | `exit 0` |
 | 4 | E2E Playwright verde | `npx playwright test` | `exit 0` |
-| 5 | Nenhum IP literal de VPS no repositório | `! git grep -nE '([0-9]{1,3}\.){3}[0-9]{1,3}' -- infra .github` | `exit 0` |
+| 5 | Nenhum IP literal de VPS no repositório | `! git grep -nP '\b(?!127\.0\.0\.1\b)(\d{1,3}\.){3}\d{1,3}\b' -- wrangler.jsonc .github docs public src` | `exit 0` |
 | 6 | Libs removidas (WebGL glass, framer-motion) | `! grep -E '"(@ybouane/liquidglass|framer-motion|patch-package)"' package.json` | `exit 0` |
 | 7 | Tela Brasil ausente do site (trava jurídica) | `! grep -ril 'tela brasil' src/data src/app src/components` | `exit 0` |
 | 8 | Nenhum domínio morto linkado | `! grep -rE 'https://(www\.)?requiemcompany\.com\.br|rhema\.requiemcompany' src` | `exit 0` |

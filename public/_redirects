@@ -1,0 +1,11 @@
+# Cloudflare Workers static assets — redirects.
+# Espelha o que next.config.ts `redirects()` aplicava no VPS (mesmos códigos).
+# Docs: https://developers.cloudflare.com/workers/static-assets/redirects/
+
+# DEC-011: SGTU passou a se chamar UniPass — Passaporte Universitário.
+/projetos/sgtu /projetos/unipass 308
+/projetos/sgtu/ /projetos/unipass 308
+
+# Tela Brasil sai do site até a checagem jurídica (TED/Serpro, mar/2027).
+/projetos/tela-brasil /projetos 307
+/projetos/tela-brasil/ /projetos 307

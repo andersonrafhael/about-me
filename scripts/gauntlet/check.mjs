@@ -2,8 +2,9 @@
 /**
  * Gauntlet exit predicate (Classe A) — andersonrafhael.requiemcompany.com.br
  *
- * Builds the site (unless --no-build), serves the production bundle on a local
- * port and measures it against scripts/gauntlet/thresholds.json:
+ * Builds the site (unless --no-build), serves the static export (`out/`) with
+ * `wrangler dev` on a local port and measures it against
+ * scripts/gauntlet/thresholds.json:
  *
  *   1. Lighthouse (mobile + desktop) on a representative route set
  *   2. axe-core WCAG 2.2 AA on EVERY route listed in /sitemap.xml
@@ -19,7 +20,7 @@
  *
  * Usage:
  *   node scripts/gauntlet/check.mjs                # full run
- *   node scripts/gauntlet/check.mjs --no-build     # reuse .next
+ *   node scripts/gauntlet/check.mjs --no-build     # reuse out/
  *   node scripts/gauntlet/check.mjs --skip=lighthouse   # fast inner loop
  *   node scripts/gauntlet/check.mjs --port=3100
  *   node scripts/gauntlet/check.mjs --base=https://andersonrafhael.requiemcompany.com.br   # audita a URL pública (sem build/serve)
@@ -42,7 +43,7 @@ const args = Object.fromEntries(
 );
 const PORT = Number(args.port ?? 3377); // porta alta pouco usual; o pré-voo abaixo garante que está livre
 // 127.0.0.1 on purpose: Node's fetch resolves `localhost` to ::1 first and the
-// first cold request to a Next server can exceed a short per-attempt timeout.
+// first cold request to the local server can exceed a short per-attempt timeout.
 const REMOTE = typeof args.base === "string" ? args.base.replace(/\/$/, "") : null;
 const BASE = REMOTE ?? `http://127.0.0.1:${PORT}`;
 const SKIP = new Set(String(args.skip ?? "").split(",").filter(Boolean));
@@ -68,9 +69,17 @@ if (!args["no-build"] && !REMOTE) {
 let server = null;
 let serverLog = "";
 const stopServer = () => {
+  if (!server) return;
+  // `npx wrangler dev` is a tree (npx → wrangler → workerd); signalling only the
+  // root leaves workerd listening on the port. The server is spawned detached in
+  // its own process group, so the whole tree gets the signal.
   try {
-    server?.kill("SIGTERM");
-  } catch {}
+    process.kill(-server.pid, "SIGTERM");
+  } catch {
+    try {
+      server.kill("SIGTERM");
+    } catch {}
+  }
 };
 if (!REMOTE) {
 // pre-flight: the port must be free, otherwise we would audit someone else's server
@@ -81,13 +90,37 @@ try {
 } catch {}
 
 log(`▶ serve ${BASE}`);
-server = spawn("npx", ["next", "start", "-p", String(PORT)], {
-  cwd: root,
-  stdio: ["ignore", "pipe", "pipe"],
-  env: { ...process.env, NODE_ENV: "production" },
-});
-server.stdout.on("data", (d) => (serverLog += d));
-server.stderr.on("data", (d) => (serverLog += d));
+startServer();
+}
+// wrangler dev serves out/ exactly like Workers static assets in production:
+// _headers, _redirects, html_handling and 404.html are all honoured.
+function startServer() {
+  server = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1"], {
+    cwd: root,
+    stdio: ["ignore", "pipe", "pipe"],
+    detached: true, // own process group — see stopServer()
+    env: { ...process.env, NODE_ENV: "production" },
+  });
+  server.stdout.on("data", (d) => (serverLog += d));
+  server.stderr.on("data", (d) => (serverLog += d));
+  server.on("exit", (code, signal) => (serverLog += `\n[gauntlet] wrangler dev exited (code ${code}, signal ${signal})\n`));
+}
+// wrangler dev's proxy layer occasionally drops its connection to workerd under
+// Lighthouse/Playwright load and the process exits ("Network connection lost").
+// The site is not at fault, so the run restarts the server instead of failing
+// every remaining check with ECONNREFUSED; each restart is reported as a warning.
+let restarts = 0;
+async function ensureServer(phase) {
+  if (REMOTE) return;
+  try {
+    const r = await fetch(BASE + "/", { signal: AbortSignal.timeout(5000) });
+    if (r.ok) return;
+  } catch {}
+  restarts += 1;
+  warn("server", `wrangler dev stopped answering before ${phase}; restart #${restarts}`);
+  stopServer();
+  startServer();
+  await waitFor(BASE + "/");
 }
 log(`▶ target ${BASE}`);
 process.on("exit", stopServer);
@@ -144,6 +177,7 @@ process.on("uncaughtException", (err) => { writePartial(err); stopServer(); cons
 process.on("unhandledRejection", (err) => { writePartial(err); stopServer(); console.error("✗ aborted:", err); process.exit(1); });
 for (const route of routes) {
   const url = BASE + route;
+  await ensureServer(`route ${route}`);
   for (const [vpName, vp] of Object.entries(viewports)) {
     const context = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
@@ -234,7 +268,7 @@ for (const route of routes) {
           if (!internalLinks.has(p)) internalLinks.set(p, route);
         } else if (/^https?:\/\//.test(href)) {
           const u = new URL(href);
-          if (u.host === `localhost:${PORT}` || (REMOTE && u.origin === new URL(REMOTE).origin)) {
+          if (u.host === `localhost:${PORT}` || u.host === `127.0.0.1:${PORT}` || (REMOTE && u.origin === new URL(REMOTE).origin)) {
             const p = u.pathname.replace(/\/$/, "") || "/";
             if (!internalLinks.has(p)) internalLinks.set(p, route);
           } else if (!externalLinks.has(href)) externalLinks.set(href, route);
@@ -294,6 +328,7 @@ await browser.close();
 // ───────────────────────── 3. links ─────────────────────────
 log(`▶ links: ${internalLinks.size} internal, ${externalLinks.size} external`);
 const linkReport = { internal: {}, external: {} };
+await ensureServer("links");
 for (const [p, from] of internalLinks) {
   try {
     const r = await fetch(BASE + p, { redirect: "follow" });
@@ -327,6 +362,7 @@ for (const [href, from] of externalLinks) {
 
 // ───────────────────────── 4. extra urls ─────────────────────────
 const extraReport = {};
+await ensureServer("extra urls");
 for (const p of T.extraUrls ?? []) {
   try {
     const r = await fetch(BASE + p);
@@ -380,7 +416,13 @@ if (!SKIP.has("lighthouse")) {
       try {
         // performance é ruidosa: duas execuções sempre, fica a PIOR (gate conservador,
         // sem viés para cima — o retry só-quando-falha inflava o resultado)
+        // wrangler dev stops answering right after a Lighthouse run tears Chrome
+        // down (last request served: the manifest icon), so every run gets a
+        // probed — and if needed restarted — server; otherwise the 2nd run
+        // measures a hung server and LCP/TBT explode.
+        await ensureServer(`lighthouse ${route} [${ff}] run 1`);
         const a1 = runLh(url, ff, 1);
+        await ensureServer(`lighthouse ${route} [${ff}] run 2`);
         const a2 = runLh(url, ff, 2);
         res = a1.scores.performance <= a2.scores.performance ? a1 : a2;
         res.metrics = {
@@ -408,6 +450,9 @@ if (!SKIP.has("lighthouse")) {
 
 // ───────────────────────── 6. report ─────────────────────────
 stopServer();
+// keep the local server's own output next to the report: when wrangler dev dies
+// mid-run (ERR_CONNECTION_REFUSED on every later route) this is the only trace
+if (serverLog) writeFileSync(path.join(reportsDir, "server.log"), serverLog);
 const report = {
   at: new Date().toISOString(),
   ok: failures.length === 0,

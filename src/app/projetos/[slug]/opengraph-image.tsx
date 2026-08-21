@@ -6,6 +6,13 @@ import { projects, statusLabel } from "@/data/projects";
 export const alt = "Projeto — Anderson Rafhael";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
+
+// Static export renders one image per project at build time.
+export async function generateStaticParams() {
+  return projects.map((p) => ({ slug: p.slug }));
+}
 
 export default async function OgImage({
   params,

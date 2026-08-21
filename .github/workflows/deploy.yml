@@ -1,56 +1,25 @@
 name: Deploy
 
+# Cloudflare Workers static assets — ver docs/runbook.md.
+# `quality` roda em todo PR e push na main; `deploy` só na main e só quando o
+# secret CLOUDFLARE_API_TOKEN existe (sem ele, o job termina com um ::notice,
+# sem falhar — o deploy manual via `npm run deploy` continua válido).
+
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
-    inputs:
-      ref:
-        description: "Branch/tag/sha para implantar"
-        required: false
-        default: main
-      rollback:
-        description: "Executar rollback para o commit anterior (.last-deploy) em vez de deploy"
-        type: boolean
-        required: false
-        default: false
 
 permissions:
   contents: read
 
-concurrency:
-  group: deploy-production
-  cancel-in-progress: false
-
-env:
-  APP_DOMAIN: andersonrafhael.requiemcompany.com.br
-  REMOTE_DIR: /opt/andersonrafhael
-  GIT_REF: ${{ github.event.inputs.ref || github.ref_name }}
-
 jobs:
-  deploy:
+  quality:
     runs-on: ubuntu-latest
     steps:
-      - name: Checar secrets obrigatórios
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
-        run: |
-          missing=()
-          [[ -z "$VPS_HOST" ]] && missing+=("VPS_HOST")
-          [[ -z "$VPS_SSH_KEY" ]] && missing+=("VPS_SSH_KEY")
-          [[ -z "$VPS_KNOWN_HOSTS" ]] && missing+=("VPS_KNOWN_HOSTS")
-          if [[ ${#missing[@]} -gt 0 ]]; then
-            echo "::error::Secrets ausentes: ${missing[*]}. Configure em Settings > Secrets and variables > Actions (ver docs/runbook.md, seção 'Deploy por Action')."
-            exit 1
-          fi
-          echo "✓ Secrets obrigatórios presentes (VPS_HOST, VPS_SSH_KEY, VPS_KNOWN_HOSTS)."
-
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ env.GIT_REF }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -64,38 +33,50 @@ jobs:
       - name: Quality gate (typecheck + lint + build)
         run: npm run quality
 
-      - name: Configurar SSH
+  deploy:
+    # Fila só do deploy: runs de PR não disputam o slot de produção.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checar secret de deploy
+        id: gate
         env:
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/deploy_key
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
-          printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-          cat >> ~/.ssh/config <<'EOF'
-          Host *
-            StrictHostKeyChecking yes
-            UserKnownHostsFile ~/.ssh/known_hosts
-          EOF
-          chmod 600 ~/.ssh/config
-
-      - name: Deploy (infra/deploy.sh)
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_IP: ${{ secrets.VPS_IP }}
-          APP_DOMAIN: ${{ env.APP_DOMAIN }}
-          REMOTE_DIR: ${{ env.REMOTE_DIR }}
-          GIT_REF: ${{ env.GIT_REF }}
-        run: |
-          if [[ "${{ github.event.inputs.rollback }}" == "true" ]]; then
-            bash infra/deploy.sh --rollback
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "::notice::Deploy pulado: secrets CLOUDFLARE_API_TOKEN/CLOUDFLARE_ACCOUNT_ID ausentes (ver docs/runbook.md, 'Deploy por Action')."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
           else
-            bash infra/deploy.sh
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Checkout
+        if: steps.gate.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: steps.gate.outputs.enabled == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        if: steps.gate.outputs.enabled == 'true'
+        run: npm ci
+
+      - name: Build (export estático em out/)
+        if: steps.gate.outputs.enabled == 'true'
+        run: npm run build
+
+      - name: Deploy (wrangler deploy)
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy

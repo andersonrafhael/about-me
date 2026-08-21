@@ -4,6 +4,8 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
 
 export default async function Icon() {
   // ImageResponse (Satori) só suporta ttf/otf/woff — woff2 falha em runtime com

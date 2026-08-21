@@ -1,171 +1,104 @@
 # Runbook — Deploy e Infraestrutura
 
-Site: `andersonrafhael.requiemcompany.com.br` · VPS compartilhada com `sigma` e `unipass`,
-via Docker + Traefik. Repositório **público** (`andersonrafhael/about-me`) — nenhum IP ou
-segredo literal deve entrar em `infra/`, `.github/` ou aqui. Use `<IP_DO_VPS>` como
-placeholder em qualquer exemplo.
+Site: `andersonrafhael.requiemcompany.com.br` · **Cloudflare Workers (static assets)**, mesmo
+padrão de `sigma-site` e `requiem-company-site`. Repositório **público** — nenhum IP, token,
+`account_id` ou segredo literal entra em `wrangler.jsonc`, `.github/` ou aqui. Use placeholders
+(`<ACCOUNT_ID>`, `<TOKEN>`) em qualquer exemplo.
 
-## Estado atual (2026-08-21)
+## Arquitetura
 
-O site **nunca esteve no ar publicamente**: o registro DNS
-`andersonrafhael.requiemcompany.com.br` não existe na zona Cloudflare (NS
-`ainsley.ns.cloudflare.com` / `chase.ns.cloudflare.com`). O VPS já responde HTTP 200
-quando se força a resolução para o IP (`curl --resolve`) — ou seja, **o app está saudável,
-falta só o registro DNS**. `sigma` e `unipass`, no mesmo VPS, já são registros A
-_proxied_ (nuvem laranja) e funcionam.
+- `next build` com `output: "export"` gera o site inteiro em `out/` (HTML por rota, payloads RSC
+  `.txt`, `_next/static/*` com hash, `feed.xml`, `llms.txt`, `sitemap.xml`, `robots.txt`,
+  `manifest.webmanifest`, ícones e imagens Open Graph pré-renderizadas por projeto/artigo).
+- `wrangler.jsonc` declara um Worker **sem script** (`andersonrafhael-site`): só `assets.directory:
+  ./out`. Requisições a assets não invocam Worker — não contam para o limite de invocações do
+  plano gratuito e não geram Workers Logs.
+- `html_handling: auto-trailing-slash` serve `/projetos` → `projetos.html` e `/projetos/sigma` →
+  `projetos/sigma.html`; formas com barra final ou `.html` redirecionam (307) para a canônica — a
+  mesma que `src/lib/seo.ts` emite em `<link rel="canonical">` (sem barra final).
+- `not_found_handling: 404-page` serve `out/404.html` (vindo de `src/app/not-found.tsx`) com
+  status 404.
+- O export não aplica `headers()`/`redirects()` do `next.config.ts`. Eles vivem em
+  `public/_headers` (CSP, HSTS, nosniff, DENY, Referrer-Policy, Permissions-Policy; cache imutável
+  em `/_next/static/*`; `Content-Type: image/png` nas rotas de imagem sem extensão; `Content-Type`
+  do RSS) e `public/_redirects` (`/projetos/sgtu` → `/projetos/unipass` 308, DEC-011;
+  `/projetos/tela-brasil` → `/projetos` 307). O build copia os dois para `out/`; o wrangler os
+  interpreta e **não** os publica como arquivos.
+- **DNS e certificado são criados pelo deploy**: `routes: [{ pattern, custom_domain: true }]`
+  faz o `wrangler deploy` registrar o hostname na zona `requiemcompany.com.br` e emitir o
+  certificado. Não há registro A, origin, Traefik nem porta 80 para cuidar.
 
----
+## (a) Deploy manual (`npm run deploy`)
 
-## (a) DNS — criar o registro na Cloudflare
-
-1. Acesse o painel Cloudflare do domínio `requiemcompany.com.br`.
-2. **DNS → Records → Add record**:
-   - Tipo: `A`
-   - Nome: `andersonrafhael`
-   - Conteúdo: `<IP_DO_VPS>`
-   - Proxy status: **Proxied** (nuvem laranja) — mesmo padrão de `sigma` e `unipass`.
-   - TTL: Auto
-3. **SSL/TLS → Overview**: modo **Full (strict)**.
-   - "Full (strict)" exige certificado válido no origin (o Let's Encrypt do Traefik cobre
-     isso) — não use "Flexible", que quebra o redirect HTTPS do Traefik.
-4. **Importante — HTTP-01 challenge**: o Traefik emite o certificado Let's Encrypt via
-   desafio HTTP-01, que precisa da **porta 80 aberta e respondendo no origin** durante a
-   emissão/renovação. Com o proxy da Cloudflare ativo, a porta 80 do VPS ainda precisa
-   estar liberada no firewall para o desafio funcionar (a Cloudflare repassa a validação).
-5. Validar propagação:
-   ```
-   dig @one.one.one.one andersonrafhael.requiemcompany.com.br
-   ```
-   Deve retornar o IP anycast da Cloudflare (proxy ativo) em minutos, não o `<IP_DO_VPS>`
-   diretamente — isso é esperado com proxy ligado.
-
----
-
-## (b) Deploy manual (`infra/deploy.sh`)
+Pré-requisitos: sessão `npx wrangler login` válida na máquina (conta Anderson; escopos padrão do
+login cobrem Workers, rotas, zona e certificados — não existe escopo de DNS separado no OAuth do
+wrangler) e gate verde:
 
 ```bash
-VPS_HOST=usuario@<IP_DO_VPS> \
-APP_DOMAIN=andersonrafhael.requiemcompany.com.br \
-bash infra/deploy.sh
+npm run quality                       # tsc + eslint + next build (gera out/)
+npm test                              # Playwright contra `wrangler dev` em :3001
+node scripts/gauntlet/check.mjs       # Lighthouse + axe + contrato HTML + teclado + links
+npm run deploy                        # = next build && wrangler deploy
 ```
 
-Variáveis opcionais: `VPS_IP` (para diagnosticar "DNS ausente" vs "app fora" via
-`--resolve`, sem depender do DNS público), `REMOTE_DIR` (default `/opt/andersonrafhael`),
-`GIT_REF` (default `main`).
+Na **primeira publicação**, se o hostname já tiver um registro DNS (ex.: o antigo A para o VPS),
+o wrangler pergunta `You already have DNS records that conflict for these Custom Domains …
+Update them?`. Responder **sim** é o cutover — o registro antigo é substituído pelo Custom
+Domain. Em terminal não interativo (CI) a substituição acontece **sem perguntar**. Anote o valor
+do registro anterior fora do repositório (vault) antes do primeiro deploy, para reverter o DNS
+manualmente se precisar.
 
-O script: checa DNS → checa pré-condições na VPS (rede `infra_sigma-network` e Traefik
-`running`) → `git fetch --all && git reset --hard origin/$GIT_REF` (tolera force-push e
-rebase, diferente de `git pull`) → `docker compose up --build -d` → healthcheck (6
-tentativas × 5s) → imprime o commit implantado.
+Checagem sem publicar: `npm run cf:check` (`wrangler deploy --dry-run` — valida config e lê o
+diretório de assets, não exige login). Pré-visualização local fiel à produção: `npm run preview`
+(`wrangler dev --port 3001`).
 
-## (c) Deploy por GitHub Action (`.github/workflows/deploy.yml`)
+## (b) Deploy por GitHub Action (`.github/workflows/deploy.yml`)
 
-Dispara em push para `main` ou manualmente (`workflow_dispatch`, input `ref`).
+- Job `quality` (`npm ci && npm run quality`): roda em todo `pull_request` e em push na `main`.
+- Job `deploy`: só em push na `main`, depois de `quality`. Se os secrets não existirem, o job
+  termina com um `::notice` **sem falhar** — o deploy manual continua sendo o caminho válido.
 
-**Secrets a criar** (Settings → Secrets and variables → Actions):
+**Secrets** (Settings → Secrets and variables → Actions):
 
-| Secret            | Conteúdo                                 | Obrigatório |
-| ----------------- | ---------------------------------------- | ----------- |
-| `VPS_HOST`        | `usuario@<IP_DO_VPS>`                    | Sim         |
-| `VPS_SSH_KEY`     | Chave privada ed25519 dedicada ao deploy | Sim         |
-| `VPS_KNOWN_HOSTS` | Saída de `ssh-keyscan -H <IP_DO_VPS>`    | Sim         |
+| Secret                  | Conteúdo                                                                 |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `CLOUDFLARE_API_TOKEN`  | Token de API escopado (abaixo)                                           |
+| `CLOUDFLARE_ACCOUNT_ID` | ID da conta Cloudflare (Workers & Pages → Overview, coluna direita)      |
 
-`VPS_KNOWN_HOSTS` é obrigatório e **não tem fallback**: o workflow não roda mais
-`ssh-keyscan` durante o deploy (isso equivaleria a confiar cegamente na primeira conexão
-— TOFU sem verificação, o próprio risco que `StrictHostKeyChecking=yes` existe para
-evitar). Gerar o valor uma única vez, fora do CI, e conferir a fingerprint por um canal
-independente (ex.: console da VPS) antes de colar no secret:
+Token (Cloudflare → My Profile → API Tokens → Create Token → Custom):
+
+| Escopo  | Permissão               | Motivo                                             |
+| ------- | ----------------------- | -------------------------------------------------- |
+| Account | Workers Scripts — Edit  | publicar versões do Worker e os assets             |
+| Zone    | DNS — Edit              | criar/atualizar o Custom Domain na zona            |
+| Account | Account Settings — Read | o wrangler resolve a conta e valida o token        |
+
+Restringir o token à conta e à zona `requiemcompany.com.br`. `permissions: contents: read` no
+workflow; `concurrency: deploy-production` evita dois deploys simultâneos.
+
+## (c) Rollback
+
+Cada `wrangler deploy` cria uma versão (assets incluídos). Reverter:
 
 ```bash
-ssh-keyscan -H <IP_DO_VPS>
+npx wrangler versions list                 # ids e datas das versões publicadas
+npx wrangler rollback <VERSION_ID>         # ou sem id: volta à versão anterior à atual
+npx wrangler deployments status            # confirma a versão ativa
 ```
 
-Gerar e autorizar a chave dedicada:
+Alternativa por Git: `git revert` na `main` + novo deploy (manual ou pela Action).
+
+## (d) Verificação pós-deploy
 
 ```bash
-ssh-keygen -t ed25519 -C deploy-andersonrafhael -f ~/.ssh/deploy-andersonrafhael
-# cole o conteúdo de deploy-andersonrafhael.pub em ~/.ssh/authorized_keys do usuário
-# de deploy na VPS; cole o conteúdo de deploy-andersonrafhael (chave privada) no
-# secret VPS_SSH_KEY do GitHub.
+dig +short andersonrafhael.requiemcompany.com.br      # resolve para anycast Cloudflare
+curl -sI https://andersonrafhael.requiemcompany.com.br                      # HTTP/2 200 + CSP/HSTS/nosniff/DENY
+curl -sI https://andersonrafhael.requiemcompany.com.br/projetos/sgtu        # 308 → /projetos/unipass
+curl -sI https://andersonrafhael.requiemcompany.com.br/projetos/sigma/opengraph-image  # 200 image/png
+curl -sI https://andersonrafhael.requiemcompany.com.br/nao-existe           # 404 (página própria)
+curl -sI 'https://andersonrafhael.requiemcompany.com.br/projetos/sigma/__next.projetos.$d$slug.txt'  # 307 → %24d%24slug → 200 (prefetch do router)
+node scripts/gauntlet/check.mjs --base=https://andersonrafhael.requiemcompany.com.br   # barra completa na URL pública
 ```
 
-Sem `VPS_HOST`/`VPS_SSH_KEY`/`VPS_KNOWN_HOSTS`, o job falha logo no primeiro step com
-mensagem explícita (não falha silenciosamente nem tenta conectar sem credencial).
-
-O job roda o gate de qualidade (`npm run quality` = `tsc --noEmit && eslint . --max-warnings 0 &&
-next build`) **antes** de qualquer passo SSH — build quebrado nunca chega a tocar a VPS.
-`concurrency: deploy-production` com `cancel-in-progress: false` garante que dois deploys
-não se sobrepõem (a fila espera, não cancela um deploy em andamento). O workflow declara
-`permissions: contents: read` no topo (o job só precisa ler o repositório).
-
-Depois de configurar SSH (chave + `known_hosts` fixado via `~/.ssh/config`, sempre
-`StrictHostKeyChecking yes`), o job chama `bash infra/deploy.sh` diretamente — o mesmo
-script do deploy manual (seção b), com `VPS_HOST`/`VPS_IP`/`APP_DOMAIN`/`REMOTE_DIR`/
-`GIT_REF` passados como variáveis de ambiente. Isso elimina a duplicação que existia
-antes (pré-voo, deploy e healthcheck reimplementados em heredocs no workflow): a lógica
-de DNS-aviso-vs-app-fora e o healthcheck só existem uma vez, no script.
-
-## (d) Rollback
-
-Manual:
-
-```bash
-VPS_HOST=usuario@<IP_DO_VPS> bash infra/deploy.sh --rollback
-```
-
-Via Action (sem precisar de acesso SSH local): Actions → workflow **Deploy** → **Run
-workflow** → marcar o input `rollback` como `true`. O job monta o mesmo SSH já usado no
-deploy normal e roda `bash infra/deploy.sh --rollback` — é o mesmo caminho de código do
-rollback manual, sem lógica duplicada no workflow.
-
-Lê `/opt/andersonrafhael/.last-deploy` (gravado a cada deploy bem-sucedido, com o commit
-que estava em produção **antes** do deploy atual), faz checkout desse commit e reconstrói
-o container. Se `.last-deploy` não existir, o script falha com mensagem clara — não há
-commit anterior registrado para reverter.
-
-Todo deploy (manual ou via Action) imprime o commit anteriormente em produção antes de
-sobrescrever — é a linha de log a consultar em caso de incidente.
-
-## (e) Checklist pós-incidente de reboot
-
-Registrado o incidente de 2026-06-08: após reboot do VPS, o `nginx` do host (systemd)
-tomou a porta `:80` antes do Traefik subir, derrubando `sigma`, `unipass` e (quando
-existir) `andersonrafhael` com HTTP 522. Fix aplicado na hora:
-`systemctl stop nginx && docker start traefik`.
-
-Checklist a rodar sempre que a VPS reiniciar:
-
-```bash
-systemctl is-enabled nginx   # deve ser: disabled
-docker ps                    # deve listar 'traefik' com status Up
-```
-
-Se `nginx` aparecer como `enabled`, rodar `systemctl disable nginx` para eliminar a
-recorrência — o risco só existe enquanto o serviço concorrente estiver habilitado no
-boot.
-
-## (f) Verificação pós-deploy
-
-```bash
-curl -sI https://andersonrafhael.requiemcompany.com.br            # esperado: HTTP/2 200
-curl -sI https://andersonrafhael.requiemcompany.com.br/sitemap.xml # esperado: HTTP/2 200
-node scripts/gauntlet/check.mjs                                    # barra local (E2E/gauntlet)
-```
-
-Enquanto o DNS não existir (seção a), os dois primeiros comandos falham por resolução de
-nome, não por o app estar fora — para confirmar a distinção, use
-`curl --resolve andersonrafhael.requiemcompany.com.br:443:<IP_DO_VPS> ...` ou
-`VPS_IP=<IP_DO_VPS>` no `deploy.sh` (seção b), que faz esse diagnóstico automaticamente.
-
----
-
-## Nota de arquitetura — por que o Dockerfile copia `src/content`
-
-`src/lib/posts.ts` lê os arquivos MDX de `src/content/posts/` via `fs.readdirSync` /
-`fs.readFileSync` em tempo de execução (não só em build) — consumido por
-`src/app/escrita/page.tsx`, `src/app/escrita/[slug]/page.tsx` e `src/app/sitemap.ts`. Mesmo
-com páginas geradas estaticamente no build, manter a cópia
-`COPY --from=builder /app/src/content ./src/content` no estágio `runner` do Dockerfile
-evita quebra em runtime (ISR, revalidação futura, ou qualquer rota que passe a ler o
-conteúdo sob demanda). Removê-la é uma otimização de tamanho de imagem que só é segura se
-todo o acesso a `src/content` for auditado e comprovadamente build-time only.
+Depois do primeiro deploy, remover o Custom Domain não apaga o certificado emitido
+(SSL/TLS → Edge Certificates) — limpeza manual se o domínio for desativado um dia.
