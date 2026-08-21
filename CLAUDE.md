@@ -9,7 +9,7 @@ Site pessoal de Anderson Rafhael — vitrine de produtos, escrita e pesquisa. Ne
 | Ação                               | Comando                                                                                                                                         |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dev                                | `npm run dev` (webpack; ver `package.json`)                                                                                                     |
-| Qualidade (gate)                   | `npm run quality` — tsc + eslint + build (export estático em `out/`)                                                                            |
+| Qualidade (gate)                   | `npm run quality` — build + tsc + eslint (o build gera `next-env.d.ts`, que tipa os `.webp`) (export estático em `out/`)                                                                            |
 | E2E                                | `npm test` (Playwright; serve `out/` com `wrangler dev` em :3001 — `npm run preview` faz o mesmo à mão)                                        |
 | Gauntlet (barra mecânica completa) | `node scripts/gauntlet/check.mjs` — Lighthouse + axe + contrato HTML/SEO + teclado + links; relatório em `scripts/gauntlet/reports/latest.json` |
 | Deploy                             | `npm run deploy` (`next build && wrangler deploy`; exige `wrangler login`) — runbook em `docs/runbook.md`; rollback: `wrangler rollback`        |

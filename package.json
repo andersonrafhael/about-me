@@ -9,7 +9,7 @@
     "deploy": "next build && wrangler deploy",
     "cf:check": "wrangler deploy --dry-run",
     "lint": "eslint",
-    "quality": "tsc --noEmit && eslint . --max-warnings 0 && next build",
+    "quality": "next build && tsc --noEmit && eslint . --max-warnings 0",
     "test": "playwright test",
     "test:ui": "npx playwright test --ui",
     "gauntlet": "node scripts/gauntlet/check.mjs",
