@@ -6,8 +6,12 @@
 # 'unsafe-inline' em script-src: o Next injeta scripts inline de hidratação sem
 # nonce, e o layout tem o marcador `html.js` e o JSON-LD. Sem terceiros, o resto
 # fica restrito à própria origem.
+# Sem `upgrade-insecure-requests`: a origem já é só-HTTPS (Cloudflare + HSTS) e não
+# há subrecurso http:. A diretiva fazia o Chromium subir para https o 307 que o
+# roteador de assets devolve nos payloads de segmento (`__next.*.$d$slug.txt` →
+# `%24d%24slug`), quebrando o prefetch do router no `wrangler dev` (ERR_SSL_PROTOCOL_ERROR).
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

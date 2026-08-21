@@ -69,9 +69,17 @@ if (!args["no-build"] && !REMOTE) {
 let server = null;
 let serverLog = "";
 const stopServer = () => {
+  if (!server) return;
+  // `npx wrangler dev` is a tree (npx → wrangler → workerd); signalling only the
+  // root leaves workerd listening on the port. The server is spawned detached in
+  // its own process group, so the whole tree gets the signal.
   try {
-    server?.kill("SIGTERM");
-  } catch {}
+    process.kill(-server.pid, "SIGTERM");
+  } catch {
+    try {
+      server.kill("SIGTERM");
+    } catch {}
+  }
 };
 if (!REMOTE) {
 // pre-flight: the port must be free, otherwise we would audit someone else's server
@@ -87,6 +95,7 @@ log(`▶ serve ${BASE}`);
 server = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1"], {
   cwd: root,
   stdio: ["ignore", "pipe", "pipe"],
+  detached: true, // own process group — see stopServer()
   env: { ...process.env, NODE_ENV: "production" },
 });
 server.stdout.on("data", (d) => (serverLog += d));
