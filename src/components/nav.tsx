@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { cva } from "class-variance-authority";
+import { useEffect, useId, useRef, useState } from "react";
 
 const links = [
   { href: "/projetos", label: "Projetos", n: "01" },
@@ -11,150 +10,138 @@ const links = [
   { href: "/pesquisa", label: "Pesquisa", n: "03" },
   { href: "/sobre", label: "Sobre", n: "04" },
   { href: "/contato", label: "Contato", n: "05" },
-];
+] as const;
 
-const navLinkClass = cva(
-  "relative flex items-center gap-1 px-3 py-2 text-[13px] font-mono transition-colors rounded hover:text-foreground hover:bg-white/[0.02]",
-  {
-    variants: {
-      active: {
-        true: "text-primary",
-        false: "text-foreground/70",
-      },
-    },
-    defaultVariants: { active: false },
-  }
-);
-
-const navNumClass = cva("text-[10px]", {
-  variants: {
-    active: {
-      true: "text-primary/70",
-      false: "text-foreground/60",
-    },
-  },
-  defaultVariants: { active: false },
-});
-
-const mobileNavLinkClass = cva(
-  "flex items-center gap-3 py-3 text-sm font-mono transition-colors border-b border-border/30 last:border-0",
-  {
-    variants: {
-      active: {
-        true: "text-primary",
-        false: "text-muted hover:text-foreground",
-      },
-    },
-    defaultVariants: { active: false },
-  }
-);
-
-function useBRTClock() {
-  const [time, setTime] = useState("");
-
+function useLocalClock(timeZone: string) {
+  const [time, setTime] = useState<string | null>(null);
   useEffect(() => {
-    const tick = () => {
-      setTime(
-        new Date().toLocaleTimeString("pt-BR", {
-          timeZone: "America/Fortaleza",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        })
-      );
-    };
+    const fmt = new Intl.DateTimeFormat("pt-BR", {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const tick = () => setTime(fmt.format(new Date()));
     tick();
-    const id = setInterval(tick, 1000);
+    const id = setInterval(tick, 15_000);
     return () => clearInterval(id);
-  }, []);
-
+  }, [timeZone]);
   return time;
+}
+
+function useScrolled(threshold = 8) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return scrolled;
 }
 
 export function Nav() {
   const pathname = usePathname();
-  const time = useBRTClock();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const time = useLocalClock("America/Fortaleza");
+  const scrolled = useScrolled();
+  const [open, setOpen] = useState(false);
+  const menuId = useId();
+  const firstLinkRef = useRef<HTMLAnchorElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
+  // fecha no Escape e ao trocar de rota; devolve o foco ao botão
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
+    firstLinkRef.current?.focus();
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [menuOpen]);
+  }, [open]);
+
+  // fecha o menu ao trocar de rota (estado derivado, ajustado durante o render)
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (prevPath !== pathname) {
+    setPrevPath(pathname);
+    setOpen(false);
+  }
+
+  const isActive = (href: string) =>
+    pathname === href || pathname?.startsWith(`${href}/`);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-14 nav-glass">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 h-14 transition-[background-color,border-color] duration-300 ${
+        scrolled || open ? "nav-glass" : "border-b border-transparent"
+      }`}
+    >
       <nav
-        className="h-full max-w-[1440px] mx-auto px-[clamp(24px,4.5vw,80px)]
-                   grid grid-cols-[1fr_auto_1fr] items-center gap-6"
+        aria-label="Principal"
+        className="container-site px-site grid h-full grid-cols-[1fr_auto] items-center gap-6 md:grid-cols-[1fr_auto_1fr]"
       >
-        {/* ── Esquerda: logo + studio ── */}
-        <div className="flex items-center gap-[18px] min-w-0 whitespace-nowrap">
+        {/* esquerda — monograma + estúdio */}
+        <div className="flex min-w-0 items-center gap-4">
           <Link
             href="/"
-            className="font-display font-bold text-[22px] leading-none tracking-tight
-                       text-foreground hover:text-fg-bright transition-colors flex items-baseline gap-px"
+            className="font-display flex items-baseline gap-px text-[20px] leading-none tracking-tight text-foreground transition-colors hover:text-fg-bright"
           >
-            AR
-            <span className="italic text-primary">.</span>
+            AR<span className="text-primary">.</span>
+            <span className="sr-only"> Anderson Rafhael — início</span>
           </Link>
-
-          <span className="w-px h-[22px] bg-border-2 shrink-0" aria-hidden />
-
-          <a
-            href="https://requiemcompany.com.br"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-[11px] tracking-[0.16em] uppercase text-foreground/50
-                       flex items-center gap-1.5 whitespace-nowrap
-                       hover:text-foreground transition-colors group hidden sm:flex"
+          <span className="h-5 w-px shrink-0 bg-border-2" aria-hidden />
+          <Link
+            href="/sobre#requiem"
+            className="mono-label hidden text-[10.5px] text-foreground/70 transition-colors hover:text-fg-bright sm:inline"
           >
             Requiem Company
-            <span className="sr-only">(abre em nova aba)</span>
-            <span aria-hidden="true"
-                  className="text-[10px] text-muted-2 group-hover:text-primary
-                             group-hover:translate-x-px group-hover:-translate-y-px
-                             transition-transform inline-block">↗</span>
-          </a>
+          </Link>
         </div>
 
-        {/* ── Centro: status live ── */}
+        {/* centro — estado */}
         <div
-          className="hidden md:flex items-center gap-3 font-mono text-[11px]
-                     tracking-[0.2em] uppercase text-foreground
-                     px-3.5 py-1.5 border border-border rounded-full
-                     bg-white/1.5 whitespace-nowrap"
+          className="chip hidden border-border text-foreground/80 md:inline-flex"
+          aria-live="off"
         >
-          <span className="relative w-2 h-2 rounded-full bg-mint shrink-0">
-            <span
-              className="absolute inset-[-3px] rounded-full border border-mint
-                         animate-[nav-ping_2.4s_ease-out_infinite] opacity-0"
-              aria-hidden
-            />
+          <span className="relative inline-flex h-2 w-2 items-center justify-center text-mint">
+            <span className="status-dot ping" data-tone="live" />
           </span>
-          <span className="text-mint font-medium">no ar</span>
-          <span className="text-muted-2">·</span>
-          <span className="text-foreground/65 tabular-nums">{time}</span>
-          <span className="text-foreground/60">BRT</span>
+          <span className="text-mint">disponível</span>
+          <span className="text-muted-2" aria-hidden>
+            ·
+          </span>
+          <span className="tabular text-foreground/80" suppressHydrationWarning>
+            {/* placeholder com a mesma largura: o relógio não move o layout ao hidratar */}
+            {time ?? "--:--"} Maceió
+          </span>
         </div>
 
-        {/* ── Direita: links numerados ── */}
+        {/* direita — links */}
         <div className="flex items-center justify-end gap-1">
-          <ul className="hidden md:flex items-center gap-1 list-none">
+          <ul className="hidden items-center gap-0.5 md:flex">
             {links.map(({ href, label, n }) => {
-              const active = pathname === href || pathname?.startsWith(href + "/");
+              const active = isActive(href);
               return (
                 <li key={href}>
-                  <Link href={href} className={navLinkClass({ active })}>
-                    <span className={navNumClass({ active })}>{n}</span>
+                  <Link
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={`relative flex min-h-10 items-center gap-1.5 rounded-md px-3 py-2 font-mono text-[13px] transition-colors hover:bg-white/[0.03] hover:text-fg-bright ${
+                      active ? "text-primary-text" : "text-foreground/80"
+                    }`}
+                  >
+                    <span
+                      className={`text-[10px] ${active ? "text-primary-text" : "text-foreground/60"}`}
+                    >
+                      {n}
+                    </span>
                     {label}
                     {active && (
                       <span
-                        className="absolute left-3 right-3 bottom-1 h-px bg-primary/70"
+                        className="absolute inset-x-3 bottom-1 h-px bg-primary-text"
                         aria-hidden
                       />
                     )}
@@ -164,44 +151,61 @@ export function Nav() {
             })}
           </ul>
 
-          {/* Mobile toggle */}
           <button
-            data-open={menuOpen}
-            className="group md:hidden flex flex-col gap-1.5 p-2.5 text-muted hover:text-foreground transition-colors"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
+            ref={toggleRef}
+            type="button"
+            className="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 rounded-md text-foreground/80 transition-colors hover:text-fg-bright md:hidden"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={open}
+            aria-controls={menuId}
           >
-            <span className="block w-5 h-px bg-current transition-transform group-data-[open=true]:rotate-45 group-data-[open=true]:translate-y-[7px]" />
-            <span className="block w-5 h-px bg-current transition-opacity group-data-[open=true]:opacity-0" />
-            <span className="block w-5 h-px bg-current transition-transform group-data-[open=true]:-rotate-45 group-data-[open=true]:translate-y-[-7px]" />
+            <span
+              className={`block h-px w-5 bg-current transition-transform duration-300 ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
+            />
+            <span
+              className={`block h-px w-5 bg-current transition-transform duration-300 ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
+            />
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div id="mobile-menu" className="md:hidden nav-glass border-t border-border/40">
-          <ul className="flex flex-col list-none px-6 py-4 gap-1">
-            {links.map(({ href, label, n }) => {
-              const active = pathname === href || pathname?.startsWith(href + "/");
-              return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    onClick={() => setMenuOpen(false)}
-                    className={mobileNavLinkClass({ active })}
-                  >
-                    <span className="text-[10px] text-muted-2">{n}</span>
-                    {label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+      {/* menu mobile */}
+      <div
+        id={menuId}
+        hidden={!open}
+        className="nav-glass border-t border-border/40 md:hidden"
+      >
+        <ul className="flex flex-col px-site py-3">
+          {links.map(({ href, label, n }, i) => {
+            const active = isActive(href);
+            return (
+              <li key={href}>
+                <Link
+                  ref={i === 0 ? firstLinkRef : undefined}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                  className={`flex min-h-12 items-center gap-3 border-b border-border/40 font-mono text-[15px] last:border-0 ${
+                    active ? "text-primary-text" : "text-foreground/85"
+                  }`}
+                >
+                  <span className="text-[11px] text-foreground/60">{n}</span>
+                  {label}
+                </Link>
+              </li>
+            );
+          })}
+          <li className="pt-3">
+            <Link
+              href="/sobre#requiem"
+              className="mono-label flex min-h-11 items-center text-foreground/70"
+            >
+              Requiem Company
+            </Link>
+          </li>
+        </ul>
+      </div>
     </header>
   );
 }

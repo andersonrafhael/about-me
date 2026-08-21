@@ -1,0 +1,29 @@
+# Dependências e build (reconstruídos dentro da imagem)
+node_modules
+.next
+
+# Controle de versão
+.git
+.gitignore
+
+# Documentação e planejamento (não necessários em runtime)
+docs
+*.md
+!README.md
+
+# Artefatos de teste e auditoria
+scripts/gauntlet/reports
+scripts/gauntlet/screens
+test-results
+playwright-report
+
+# Harness de IA — não deve entrar na imagem publicada
+.claude
+.agents
+.codex
+.opencode
+
+# Diversos
+.DS_Store
+*.log
+.env*

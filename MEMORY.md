@@ -39,7 +39,7 @@ Site de portfólio pessoal de Anderson Rafhael — conteúdo real escrito, MDX f
 8. **[P3] "Em breve"** placeholder visível em `escrita/page.tsx:112` — remover se não há previsão.
 9. **[P3] `manifest.ts` ausente** — favicon/PWA metadata.
 
-## Ops / Infra (VPS 72.60.54.190)
+## Ops / Infra (VPS — IP no cofre/runbook)
 
 - **2026-06-08 — Incidente Traefik:** após reboot, o `nginx` do host (systemd) subiu antes e tomou a porta `:80`, impedindo o Traefik (reverse proxy de TODOS os apps) de bindar → todos os sites Cloudflare-fronted caíram com HTTP 522. Fix: `systemctl stop nginx` + `docker start traefik`.
 - **⚠️ Risco de recorrência:** confirmar que `systemctl disable nginx` foi executado na VPS. Se o nginx do host continuar habilitado, o próximo reboot repete o incidente (corrida pela :80).

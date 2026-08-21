@@ -1,0 +1,47 @@
+---
+task: "redesign-2026-08"
+plan-ref: "docs/plans/2026-08-21-redesign/plan.md"
+date: "2026-08-21"
+size: "L"
+---
+
+# Outcomes — redesign-2026-08
+
+Critérios de saída declarativos e machine-checkable.
+
+## Critérios de Saída
+
+| # | Critério | Comando de Verificação | Esperado |
+|---|---------|----------------------|---------|
+| 1 | Gate mecânico verde (tsc + eslint + build) | `npm run quality` | `exit 0` |
+| 2 | Barra do gauntlet (Lighthouse, axe, HTML/SEO, teclado, links) | `node scripts/gauntlet/check.mjs` | `exit 0` |
+| 3 | Contrato de loop válido | `python3 ~/Desktop/Antigravity/requiem-forge/scripts/loop-contract-validate.py docs/plans/2026-08-21-redesign/loop-contract.json --repo-root .` | `exit 0` |
+| 4 | E2E Playwright verde | `npx playwright test` | `exit 0` |
+| 5 | Nenhum IP literal de VPS no repositório | `! git grep -nE '([0-9]{1,3}\.){3}[0-9]{1,3}' -- infra .github` | `exit 0` |
+| 6 | Libs removidas (WebGL glass, framer-motion) | `! grep -E '"(@ybouane/liquidglass|framer-motion|patch-package)"' package.json` | `exit 0` |
+| 7 | Tela Brasil ausente do site (trava jurídica) | `! grep -ril 'tela brasil' src/data src/app src/components` | `exit 0` |
+| 8 | Nenhum domínio morto linkado | `! grep -rE 'https://(www\.)?requiemcompany\.com\.br|rhema\.requiemcompany' src` | `exit 0` |
+| 9 | Slug `sgtu` redireciona para `unipass` | `grep -q 'unipass' next.config.ts && grep -q 'sgtu' next.config.ts` | `exit 0` |
+| 10 | Trabalho publicado para revisão humana (branch + PR; o hook `main-push-guard` do Forge veda push direto em `main`) | `test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/redesign/2026-08-vitrine \| cut -f1)" && gh pr view 1 --json state -q .state \| grep -q OPEN` | `exit 0` |
+
+## Verify All
+
+```bash
+npm run quality && \
+node scripts/gauntlet/check.mjs --no-build && \
+python3 ~/Desktop/Antigravity/requiem-forge/scripts/loop-contract-validate.py docs/plans/2026-08-21-redesign/loop-contract.json --repo-root . && \
+npx playwright test && \
+! git grep -nE '([0-9]{1,3}\.){3}[0-9]{1,3}' -- infra .github && \
+! grep -E '"(@ybouane/liquidglass|framer-motion|patch-package)"' package.json && \
+! grep -ril 'tela brasil' src/data src/app src/components && \
+! grep -rE 'https://(www\.)?requiemcompany\.com\.br|rhema\.requiemcompany' src && \
+grep -q 'unipass' next.config.ts && grep -q 'sgtu' next.config.ts && \
+test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/redesign/2026-08-vitrine | cut -f1)" && \
+echo "ALL OUTCOMES PASS"
+```
+
+## Status
+
+- [x] Todos os critérios passando individualmente (2026-08-21)
+- [x] `verify-all` executado como cadeia equivalente na rodada 6 (`npm run quality` → `check.mjs --no-build` → `playwright test`, mesma build, EXIT=0 nos três) + critérios 3 e 5–10 reexecutados em seguida, todos `exit 0`
+- [x] Evidência registrada em `verify.md`

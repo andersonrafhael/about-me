@@ -1,0 +1,53 @@
+import fs from "fs";
+import path from "path";
+import { ImageResponse } from "next/og";
+
+export const size = { width: 180, height: 180 };
+export const contentType = "image/png";
+
+export default async function AppleIcon() {
+  // ImageResponse (Satori) só suporta ttf/otf/woff — woff2 falha em runtime com
+  // "Unsupported OpenType signature wOF2". src/assets/fonts/SpaceGrotesk-Bold.ttf
+  // é a mesma fonte, convertida losslessly via `woff2_decompress`.
+  const spaceGroteskBold = fs.readFileSync(
+    path.join(process.cwd(), "src/assets/fonts/SpaceGrotesk-Bold.ttf"),
+  );
+
+  return new ImageResponse(
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0e0e13",
+        border: "1px solid rgba(139,92,246,0.35)",
+        borderRadius: 40,
+      }}
+    >
+      <span
+        style={{
+          fontFamily: "Space Grotesk",
+          fontSize: 88,
+          fontWeight: 700,
+          color: "#8b5cf6",
+          letterSpacing: "-0.02em",
+        }}
+      >
+        AR
+      </span>
+    </div>,
+    {
+      ...size,
+      fonts: [
+        {
+          name: "Space Grotesk",
+          data: spaceGroteskBold,
+          weight: 700,
+          style: "normal",
+        },
+      ],
+    },
+  );
+}

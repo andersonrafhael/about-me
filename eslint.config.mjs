@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // artefatos locais do harness / relatórios — não são código do site
+    "quality-gate-ratchet.js",
+    "scripts/gauntlet/reports/**",
+    "scripts/gauntlet/screens/**",
   ]),
 ]);
 

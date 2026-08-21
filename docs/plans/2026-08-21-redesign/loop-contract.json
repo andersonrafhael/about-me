@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "Contrato de terminação do gauntlet de redesign — andersonrafhael.requiemcompany.com.br.",
+    "Validado com: python3 ~/Desktop/Antigravity/requiem-forge/scripts/loop-contract-validate.py docs/plans/2026-08-21-redesign/loop-contract.json --repo-root .",
+    "Saída é Classe A: scripts/gauntlet/check.mjs devolve exit 0 só quando Lighthouse, axe, contrato HTML, teclado, links e URLs extras passam a barra de scripts/gauntlet/thresholds.json.",
+    "O eixo estético (crítica fresh-context) NUNCA termina o loop; tem teto de 3 rodadas e terminador humano (Anderson revisa após o deploy)."
+  ],
+
+  "goal": "Site pessoal redesenhado passa a barra mecânica (Lighthouse mobile ≥90/100/95/100, desktop ≥95/100/95/100, axe WCAG 2.2 AA zero violações em todas as rotas, contrato HTML/SEO por rota, navegação por teclado, zero links internos quebrados) servido como build de produção local",
+
+  "bar": {
+    "kind": "benchmark-number",
+    "source": "scripts/gauntlet/thresholds.json",
+    "captured_at": "2026-08-21",
+    "note": "Thresholds derivados do design doc original (Lighthouse Perf ≥90, A11y ≥95 → elevado a 100 porque axe zero-violations já é exigido) e do quality-gates.md (WCAG 2.2 AA como blocker)."
+  },
+
+  "exit_predicate": {
+    "command": "node scripts/gauntlet/check.mjs",
+    "pass_condition": "exit 0",
+    "class": "A"
+  },
+
+  "ceilings": {
+    "max_rounds": 6,
+    "max_tokens": 3000000,
+    "max_wall_clock": "6h"
+  },
+
+  "aesthetic_axis": {
+    "description": "Crítica de direção de arte, copy e AI-tells por revisor de contexto limpo (frontend-sophistication + ux-heuristics + humanizer). Gera WARNINGs que o orquestrador triage; nunca é condição de saída.",
+    "max_rounds": 3,
+    "terminator": "human"
+  },
+
+  "unverified_risk": [
+    "DNS/TLS reais — o registro andersonrafhael.requiemcompany.com.br não existe na zona Cloudflare; o check roda contra build local, não contra a URL pública",
+    "Leitor de tela real (VoiceOver/NVDA) — não executado; axe + árvore de acessibilidade do Playwright são proxies",
+    "Dispositivo móvel real — emulação Playwright/Lighthouse, sem toque físico nem rede 4G real",
+    "Core Web Vitals de campo (CrUX) — só lab data até haver tráfego",
+    "URL do LinkedIn — LinkedIn devolve 999 para bots; não verificável por máquina",
+    "Ortografia pt-BR — sem verificador automático; revisão humana/Classe B"
+  ]
+}

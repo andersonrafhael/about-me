@@ -1,196 +1,295 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { AnimatedSection } from "@/components/animated-section";
 import { AvatarInitials } from "@/components/avatar-initials";
+import { Reveal } from "@/components/reveal";
+import { getProject, featuredProjects } from "@/data/projects";
+import { manifesto, now, site, timeline, values } from "@/data/site";
+import { breadcrumb, profilePage, serializeJsonLd } from "@/lib/json-ld";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Sobre",
   description:
-    "Anderson Rafhael, fundador da Requiem Company. Engenheiro de software construindo infraestrutura digital para gestão pública, políticas sociais e tomada de decisão.",
-};
+    "Anderson Rafhael, engenheiro de computação e fundador da Requiem Company em Maceió: quem é, como trabalha, no que está focado agora e a trajetória até aqui.",
+  path: "/sobre",
+});
 
-const stack = [
-  { cat: "Frontend", items: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"] },
-  { cat: "Backend", items: ["Django 5", "DRF", "PostgreSQL", "PostGIS"] },
-  { cat: "Infra", items: ["Docker", "Nginx", "Cloudflare", "VPS próprio"] },
-  { cat: "IA / ML", items: ["LLM APIs", "RAG", "Claude API", "Python"] },
-];
+const stackColumns = [
+  {
+    label: "Frontend",
+    items: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS v4"],
+  },
+  { label: "Backend", items: ["Django 5", "DRF", "PostgreSQL", "PostGIS"] },
+  {
+    label: "Infra",
+    items: ["Docker", "Traefik", "Cloudflare", "VPS própria"],
+  },
+  { label: "IA", items: ["Claude API", "RAG local", "pgvector", "Python"] },
+] as const;
+
+function formatUpdatedAt(iso: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${iso}T00:00:00`));
+}
 
 export default function SobrePage() {
+  const requiemForge = getProject("requiem-forge");
+  const requiemLinks = requiemForge
+    ? [...featuredProjects, requiemForge]
+    : featuredProjects;
+
   return (
-    <div className="min-h-screen px-site max-w-[1280px] mx-auto">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(profilePage()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            breadcrumb([
+              { name: "Início", path: "/" },
+              { name: "Sobre", path: "/sobre" },
+            ]),
+          ),
+        }}
+      />
+      <div className="container-site px-site">
+        <div className="pt-page mb-12">
+          <nav
+            aria-label="Trilha"
+            className="mono-label flex items-center gap-2.5"
+          >
+            <Link
+              href="/"
+              className="text-foreground/70 transition-colors hover:text-fg-bright"
+            >
+              Início
+            </Link>
+            <span className="text-muted-2" aria-hidden>
+              /
+            </span>
+            <span className="text-foreground">Sobre</span>
+          </nav>
+        </div>
 
-      {/* ── Breadcrumb ── */}
-      <div className="pt-page mb-16">
-        <nav className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                        flex items-center gap-2.5" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-foreground transition-colors text-muted">Início</Link>
-          <span className="text-muted-2">/</span>
-          <span className="text-foreground font-medium">Sobre</span>
-        </nav>
-      </div>
-
-      {/* ── Title block ── */}
-      <div className="grid grid-cols-[1fr_auto] items-end gap-8 mb-[clamp(56px,8vh,96px)]
-                      pb-[clamp(40px,5vh,64px)] border-b border-border">
-        <h1 className="editorial-title">
-          Sobre<span className="punct">.</span>
-        </h1>
-        <div className="hidden sm:flex items-end gap-5 pb-4">
-          <AvatarInitials size="md" />
-          <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-muted text-right
-                          leading-[1.8]">
-            <b className="text-foreground font-medium block">Anderson Rafhael</b>
-            Fundador · Engenheiro<br />
-            Maceió, AL · Brasil
+        <header className="mb-[clamp(48px,7vh,88px)] grid gap-6 border-b border-border pb-[clamp(32px,5vh,56px)] md:grid-cols-[1fr_auto] md:items-end">
+          <h1 className="editorial-title">
+            Sobre<span className="punct">.</span>
+          </h1>
+          <div className="flex items-end gap-5">
+            <AvatarInitials size="md" />
+            <div className="mono-label text-right leading-relaxed">
+              <span className="block text-foreground">{site.name}</span>
+              <span>Fundador · Engenheiro de computação</span>
+              <br />
+              <span>{site.location}</span>
+            </div>
           </div>
+        </header>
+
+        <div className="divide-y divide-border">
+          {/* Quem */}
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <h2 className="mono-label sticky top-[88px] h-fit">Quem</h2>
+            <Reveal>
+              <div className="prose-custom">
+                <p>
+                  Engenheiro de computação formado pela Universidade Federal de
+                  Alagoas e fundador da Requiem Company, em Maceió. Construo
+                  infraestrutura digital para instituições públicas: sistemas
+                  que prefeituras usam para cuidar da sinalização viária e do
+                  transporte universitário, que hospitais usam para acompanhar
+                  quem carrega um dispositivo implantável, que operadores usam
+                  para gerir recarga elétrica.
+                </p>
+                <p>
+                  Nasci em 1998, em Alagoas, e escolhi construir daqui. Fora do
+                  eixo São Paulo–Rio, sem capital externo, com a convicção de
+                  que tecnologia de qualidade para o setor público não é
+                  privilégio de capital: é método, requisito bem escrito e gente
+                  disposta a ir a campo.
+                </p>
+                <p>
+                  No NEES/UFAL atuo como gerente de produto em plataformas
+                  federais do Ministério da Cultura e do Ministério da Educação,
+                  e faço pesquisa em engenharia de requisitos e sistemas de
+                  informação pública. Produto e pesquisa andam no mesmo ciclo: o
+                  que vai para produção também vira hipótese, e o que a hipótese
+                  revela volta para o produto.
+                </p>
+              </div>
+            </Reveal>
+          </section>
+
+          {/* Requiem Company */}
+          <section
+            id="requiem"
+            className="section-grid scroll-mt-24 py-[clamp(48px,7vh,88px)]"
+          >
+            <h2 className="mono-label sticky top-[88px] h-fit">
+              Requiem Company
+            </h2>
+            <Reveal>
+              <div className="flex flex-col gap-8">
+                <p className="lede">{site.company.description}</p>
+                <dl className="grid gap-6 sm:grid-cols-3">
+                  {manifesto.markers.map((m) => (
+                    <div key={m.label} className="flex flex-col gap-1.5">
+                      <dt className="mono-sublabel">{m.label}</dt>
+                      <dd className="text-[14px] leading-relaxed text-foreground/75">
+                        {m.detail}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <ul className="flex flex-col gap-2">
+                  {requiemLinks.map((p) => (
+                    <li key={p.slug}>
+                      <Link href={`/projetos/${p.slug}`} className="link-quiet">
+                        {p.name} — {p.tagline}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-[14px] text-foreground/70">
+                  Fundada em 2024. Sem capital externo.
+                </p>
+              </div>
+            </Reveal>
+          </section>
+
+          {/* Agora */}
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <h2 className="mono-label sticky top-[88px] h-fit">Agora</h2>
+            <Reveal>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col divide-y divide-border border-t border-border">
+                  {now.items.map((item) => (
+                    <div
+                      key={item.title}
+                      className="flex flex-col gap-1.5 py-5"
+                    >
+                      <h3 className="font-headline text-[17px] leading-snug text-foreground">
+                        {item.title}
+                      </h3>
+                      <p className="max-w-[58ch] text-[14px] leading-relaxed text-foreground/75">
+                        {item.detail}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <p className="font-mono text-[11px] text-foreground/60">
+                  atualizado em {formatUpdatedAt(now.updatedAt)}
+                </p>
+              </div>
+            </Reveal>
+          </section>
+
+          {/* Como trabalho */}
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <h2 className="mono-label sticky top-[88px] h-fit">
+              Como trabalho
+            </h2>
+            <Reveal>
+              <div className="prose-custom">
+                <p>
+                  Sistemas, não features. Cada projeto nasce multi-tenant,
+                  auditável e documentado, com controle de acesso e
+                  observabilidade desde o primeiro ambiente — porque instituição
+                  pública muda de gestão, e o sistema precisa sobreviver a isso.
+                </p>
+                <p>
+                  Especificação antes de código. O Requiem Forge, o harness que
+                  mantenho, dimensiona cada tarefa, exige critério de aceite e
+                  só aceita “pronto” depois de um gate mecânico. Revisão em
+                  contexto limpo, separada de quem implementou.
+                </p>
+                <p>
+                  Requisitos com validade. Com o RHEMA, requisitos têm posição
+                  na hierarquia, data de validade e maturidade composta. Um
+                  requisito envelhecido é sinalizado antes de virar bug em
+                  produção.
+                </p>
+              </div>
+            </Reveal>
+          </section>
+
+          {/* Trajetória */}
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <h2 className="mono-label sticky top-[88px] h-fit">Trajetória</h2>
+            <Reveal>
+              <ol className="flex flex-col">
+                {timeline.map((t) => (
+                  <li key={t.year} className="grid grid-cols-[72px_1fr] gap-6">
+                    <span className="pt-1 font-mono text-[12px] text-primary-text">
+                      {t.year}
+                    </span>
+                    <div className="flex flex-col gap-1.5 border-l border-border pb-10 pl-6 last:pb-0">
+                      <h3 className="font-headline text-[18px] leading-snug text-foreground">
+                        {t.title}
+                      </h3>
+                      <p className="max-w-[58ch] text-[14px] leading-relaxed text-foreground/75">
+                        {t.detail}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Reveal>
+          </section>
+
+          {/* Stack */}
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <h2 className="mono-label sticky top-[88px] h-fit">Stack</h2>
+            <Reveal>
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {stackColumns.map(({ label, items }) => (
+                  <div key={label} className="flex flex-col gap-3">
+                    <span className="mono-sublabel">{label}</span>
+                    <ul className="flex flex-col gap-1.5">
+                      {items.map((item) => (
+                        <li
+                          key={item}
+                          className="text-[14px] text-foreground/85"
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </section>
+
+          {/* Valores */}
+          <section className="section-grid py-[clamp(48px,7vh,88px)]">
+            <h2 className="mono-label sticky top-[88px] h-fit">Valores</h2>
+            <Reveal>
+              <div className="flex flex-wrap gap-2">
+                {values.map((v) => (
+                  <span key={v} className="chip">
+                    <span className="text-foreground/80">{v}</span>
+                  </span>
+                ))}
+              </div>
+            </Reveal>
+          </section>
+        </div>
+
+        <div className="flex flex-col items-center gap-8 py-[clamp(56px,8vh,96px)] text-center">
+          <p className="font-headline text-[clamp(20px,2.4vw,30px)] text-fg-bright">
+            {site.lema}
+          </p>
+          <Link href="/contato" className="btn btn-primary">
+            Entrar em contato
+          </Link>
         </div>
       </div>
-
-      {/* ── Sections ── */}
-      <div className="flex flex-col divide-y divide-border">
-
-        {/* Origem */}
-        <AnimatedSection>
-          <section className="py-[clamp(48px,7vh,88px)]">
-            <div className="flex items-center gap-5 mb-8">
-              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
-                Origem
-              </h2>
-              <div className="flex-1 h-px bg-border/40" aria-hidden />
-            </div>
-            <div className="prose-custom max-w-[72ch]">
-              <p>
-                Fundador da{" "}
-                <a href="https://requiemcompany.com.br" target="_blank" rel="noopener noreferrer"
-                className="text-foreground hover:text-primary transition-colors">Requiem Company</a>{" "}
-                e engenheiro de software com foco em sistemas institucionais. Construo infraestrutura
-                digital que apoia políticas públicas, gerencia processos críticos e oferece suporte à
-                tomada de decisão com impacto real — sobre cidades, sobre escolas, sobre saúde pública.
-              </p>
-              <p>
-                Nasci em 29 de abril de 1998, cresci em Alagoas. Comecei a construir sistemas para
-                prefeituras antes de qualquer credencial formal — o primeiro contrato municipal veio
-                da qualidade do trabalho, não do currículo. Não esperei condições ideais para começar.
-              </p>
-              <p>
-                Fora do eixo SP-RJ. Em 2024 fundei a Requiem Company com um objetivo claro:
-                infraestrutura digital de excelência com densidade técnica, utilidade social real
-                e zero capital externo. Cada contrato financiou o próximo — e ainda é assim.
-              </p>
-            </div>
-          </section>
-        </AnimatedSection>
-
-        {/* O que faço */}
-        <AnimatedSection>
-          <section className="py-[clamp(48px,7vh,88px)]">
-            <div className="flex items-center gap-5 mb-8">
-              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
-                O que faço
-              </h2>
-              <div className="flex-1 h-px bg-border/40" aria-hidden />
-            </div>
-            <div className="prose-custom max-w-[72ch]">
-              <p>
-                Construo sistemas — não features. Cada projeto é pensado como infraestrutura:
-                multi-tenant, auditável, escalável, com governança. RBAC/ABAC nativos,
-                documentação técnica como cidadã de primeira classe, APIs com envelope padrão,
-                observabilidade desde o dia zero.
-              </p>
-              <p>
-                Transito entre engenharia de software, gestão de produto, gestão de projetos,
-                documentação técnica, atuação institucional e visão empresarial. Não sou especialista
-                em uma fatia — domino o sistema inteiro. Do levantamento de requisitos com secretários
-                municipais ao deploy em VPS próprio.
-              </p>
-              <p>
-                Paralelamente ao produto, faço pesquisa acadêmica no NEES/UFAL: engenharia de requisitos
-                formal, sistemas de informação para gestão pública, healthtech. 4 papers publicados em
-                conferências internacionais (DGO, SBCAS). Pipeline ativo para SBES 2026, SBCAS 2026 e
-                IEEE Access.
-              </p>
-            </div>
-          </section>
-        </AnimatedSection>
-
-        {/* Stack */}
-        <AnimatedSection>
-          <section className="py-[clamp(48px,7vh,88px)]">
-            <div className="flex items-center gap-5 mb-8">
-              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
-                Stack
-              </h2>
-              <div className="flex-1 h-px bg-border/40" aria-hidden />
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {stack.map(({ cat, items }) => (
-                <div key={cat} className="flex flex-col gap-3">
-                  <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
-                    {cat}
-                  </span>
-                  <ul className="flex flex-col gap-1.5">
-                    {items.map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-[14px] text-foreground">
-                        <span className="w-1 h-1 rounded-full bg-primary/60 shrink-0" aria-hidden />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-        </AnimatedSection>
-
-        {/* Valores */}
-        <AnimatedSection>
-          <section className="py-[clamp(48px,7vh,88px)]">
-            <div className="flex items-center gap-5 mb-8">
-              <h2 className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted shrink-0">
-                Valores
-              </h2>
-              <div className="flex-1 h-px bg-border/40" aria-hidden />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Excelência como dever",
-                "Utilidade real",
-                "Legado",
-                "Estrutura antes de estética",
-                "Responsabilidade",
-                "Escala com sentido",
-                "Serviço público",
-                "Autonomia",
-              ].map((v) => (
-                <span key={v}
-                  className="px-3 py-1.5 rounded border border-border text-[12px] font-mono text-muted
-                             tracking-[0.06em]">
-                  {v}
-                </span>
-              ))}
-            </div>
-          </section>
-        </AnimatedSection>
-
-      </div>
-
-      {/* ── Footer CTA ── */}
-      <div className="py-[clamp(64px,10vh,120px)] border-t border-border mt-8 text-center">
-        <p className="font-editorial italic text-muted text-lg mb-6">
-          &ldquo;Que meu cansaço a outros descanse.&rdquo;
-        </p>
-        <Link
-          href="/contato"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg
-                     bg-primary text-primary-foreground font-medium text-sm
-                     hover:bg-primary-deep transition-colors"
-        >
-          Entrar em contato
-          <span aria-hidden>→</span>
-        </Link>
-      </div>
-
-    </div>
+    </>
   );
 }
