@@ -1,0 +1,83 @@
+{
+  "_comment": "Barra mecânica (Classe A) do gauntlet de redesign — consumida por scripts/gauntlet/check.mjs. Ajustar valores é decisão registrada em docs/plans/2026-08-21-redesign/, nunca conveniência de rodada.",
+  "lighthouseRoutes": [
+    "/",
+    "/projetos",
+    "/projetos/sigma",
+    "/escrita",
+    "/escrita/sdd-spec-driven-development",
+    "/pesquisa",
+    "/sobre",
+    "/contato"
+  ],
+  "lighthouse": {
+    "mobile": {
+      "performance": 90,
+      "accessibility": 100,
+      "best-practices": 95,
+      "seo": 100
+    },
+    "desktop": {
+      "performance": 95,
+      "accessibility": 100,
+      "best-practices": 95,
+      "seo": 100
+    },
+    "metrics": {
+      "_comment": "limites por métrica (ms / score) além das notas de categoria; CLS \"good\" = 0,1",
+      "cls": 0.1,
+      "tbt": 300
+    }
+  },
+  "axe": {
+    "tags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21a",
+      "wcag21aa",
+      "wcag22aa"
+    ],
+    "maxViolations": 0
+  },
+  "html": {
+    "lang": "pt-BR",
+    "titleMax": 65,
+    "descriptionMin": 70,
+    "descriptionMax": 160,
+    "requireCanonical": true,
+    "requireOgImage": true,
+    "requireJsonLd": true,
+    "singleH1": true,
+    "requireMainLandmark": true,
+    "requireSkipLink": true,
+    "requireContentinfo": true
+  },
+  "links": {
+    "failOnExternal": false,
+    "externalAllowedStatus": {
+      "linkedin.com": [
+        999,
+        429
+      ]
+    },
+    "mustBeReachable": [
+      "github.com",
+      "mred.com.br",
+      "cultbr.cultura.gov.br",
+      "sigma.requiemcompany.com.br",
+      "unipass.requiemcompany.com.br"
+    ]
+  },
+  "extraUrls": [
+    "/robots.txt",
+    "/sitemap.xml",
+    "/manifest.webmanifest",
+    "/feed.xml",
+    "/opengraph-image"
+  ],
+  "keyboard": {
+    "skipLinkFirst": true,
+    "focusVisible": true
+  },
+  "maxConsoleErrors": 0
+}
