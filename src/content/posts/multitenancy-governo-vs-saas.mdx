@@ -1,6 +1,7 @@
 ---
 slug: "multitenancy-governo-vs-saas"
 title: "Multitenancy em governo não é multitenancy em SaaS"
+seoTitle: "Multitenancy em governo não é SaaS"
 excerpt: "Aplicar padrões de multi-tenant B2B em sistemas de governo sem ajustar as premissas não é errado — é arriscado de um jeito que só aparece em auditoria, processo judicial, ou cruzamento de dados entre convênios."
 date: "2026-05-14"
 tags: ["GovTech", "Arquitetura", "LGPD", "Engenharia de Software"]
@@ -47,7 +48,7 @@ Isso não é feature — é requisito legal. A diferença entre "log de aplicaç
 
 **Decisão 1: tentar usar o mesmo modelo de dados para tenants públicos e privados**
 
-No SGTU — sistema de gerenciamento de transporte universitário multi-tenant — começamos com o modelo padrão: cada tenant tem suas próprias entidades, acessíveis apenas ao seu contexto. O problema surgiu quando percebemos que dados precisavam cruzar fronteiras de tenant por razão regulatória: rotas intermunicipais, convênios entre instituições, dados de estudante que transitam entre vínculos diferentes.
+No UniPass — Passaporte Universitário, plataforma multi-tenant de transporte universitário municipal — começamos com o modelo padrão: cada tenant tem suas próprias entidades, acessíveis apenas ao seu contexto. O problema surgiu quando percebemos que dados precisavam cruzar fronteiras de tenant por razão regulatória: rotas intermunicipais, convênios entre instituições, dados de estudante que transitam entre vínculos diferentes.
 
 Dados que cruzam fronteiras de tenant em governo não são exceção — são padrão. Convênios federativos, políticas nacionais implementadas localmente, dados de cidadãos que transitam entre municípios. O modelo de "dado pertence ao tenant" não mapeia para essa realidade.
 
@@ -95,4 +96,4 @@ Descobrir isso com contrato assinado e dado real de cidadão em produção é ma
 
 ---
 
-*Os padrões descritos emergiram de decisões de arquitetura no SGTU (Sistema de Gerenciamento do Transporte Universitário, implantado em Campo Alegre/AL) e no CultBR (plataforma de gestão cultural federativa com 5.595 entes), projetos da Requiem Company.*
+*Os padrões descritos emergiram de decisões de arquitetura no UniPass (Passaporte Universitário — transporte universitário municipal, produto da Requiem Company em preparação para a primeira implantação em Alagoas) e no CultBR (plataforma de gestão cultural federativa com 5.595 entes, do NEES/UFAL com o Ministério da Cultura, onde atuei como gerente de produto).*
