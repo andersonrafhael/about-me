@@ -24,6 +24,9 @@ thresholds em `scripts/gauntlet/thresholds.json`, contrato em `docs/plans/2026-0
   capturas do Sigma (ou loader `/cdn-cgi/image/` se Transformations estiver ativo na zona) — nunca subir threshold.
 - Desvio deliberado de CSP: `upgrade-insecure-requests` removido (quebrava o 307 de prefetch `$d$slug` no
   `wrangler dev` http); origem é HTTPS-only com HSTS, sem subresource http — documentado em `public/_headers`.
+- `main` = 3522b63: migração (PR #3) + fix de CI (PR #4: `quality` = `next build && tsc && eslint` — `next-env.d.ts`
+  é gitignored e só o build o gera; `next typegen` não existe no 16.2). Job `deploy` da Action sai com `::notice`
+  até existirem os secrets.
 - **Deploy bloqueado pelo classificador de permissões do auto mode** (`wrangler deploy` = publicação externa).
   A sessão `wrangler` OAuth deste Mac está válida (conta do Anderson, escopos workers/routes/ssl_certs write).
   **Próximo passo (1 comando, ~1 min):** `npm run deploy` na `main` (ou liberar `Bash(./node_modules/.bin/wrangler deploy*)`

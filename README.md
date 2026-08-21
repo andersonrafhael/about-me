@@ -13,7 +13,7 @@ Sem CMS, sem analytics, sem cookies. Conteúdo vive em `src/data/*.ts` (projetos
 ```bash
 npm install
 npm run dev            # http://localhost:3000
-npm run quality        # tsc + eslint + build (export estático em out/)
+npm run quality        # build + tsc + eslint (export estático em out/)
 npm run preview        # serve out/ com wrangler dev em :3001 (headers, redirects e 404 como em produção)
 npm run gauntlet       # build + Lighthouse + axe + contrato HTML/SEO + teclado + links
 ```
