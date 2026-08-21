@@ -96,6 +96,7 @@ curl -sI https://andersonrafhael.requiemcompany.com.br                      # HT
 curl -sI https://andersonrafhael.requiemcompany.com.br/projetos/sgtu        # 308 → /projetos/unipass
 curl -sI https://andersonrafhael.requiemcompany.com.br/projetos/sigma/opengraph-image  # 200 image/png
 curl -sI https://andersonrafhael.requiemcompany.com.br/nao-existe           # 404 (página própria)
+curl -sI 'https://andersonrafhael.requiemcompany.com.br/projetos/sigma/__next.projetos.$d$slug.txt'  # 307 → %24d%24slug → 200 (prefetch do router)
 node scripts/gauntlet/check.mjs --base=https://andersonrafhael.requiemcompany.com.br   # barra completa na URL pública
 ```
 
