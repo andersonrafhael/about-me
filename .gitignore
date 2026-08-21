@@ -39,3 +39,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ── Requiem Forge harness — local-only in this public repo (methodology is not published) ──
+.claude/*
+!.claude/MEMORY.md
+.agents/
+.codex/
+.opencode/
+opencode.json
+.mcp.json
+quality-gate-ratchet.js
+
+# ── audit / gauntlet artifacts ──
+/test-results/
+/playwright-report/
+/scripts/audit-screenshots/
+/scripts/gauntlet/reports/
+/scripts/gauntlet/screens/
+
+# Playwright MCP artifacts (qa sessions)
+.playwright-mcp/

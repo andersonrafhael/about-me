@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# andersonrafhael.requiemcompany.com.br
 
-## Getting Started
+Site pessoal de [Anderson Rafhael](https://andersonrafhael.requiemcompany.com.br) — engenheiro de computação e fundador da Requiem Company, em Maceió. Produtos, escrita e pesquisa em infraestrutura digital para gestão pública, saúde e mobilidade.
 
-First, run the development server:
+## Stack
+
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript strict · Tailwind CSS v4 · MDX · Docker standalone atrás de Traefik.
+
+Sem CMS, sem analytics, sem cookies. Conteúdo vive em `src/data/*.ts` (projetos, site, pesquisa) e `src/content/posts/*.mdx` (artigos).
+
+## Desenvolvimento
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev            # http://localhost:3000
+npm run quality        # tsc + eslint + build
+npm run gauntlet       # build + Lighthouse + axe + contrato HTML/SEO + teclado + links
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O gauntlet (`scripts/gauntlet/check.mjs`) é a barra mecânica do site: Lighthouse mobile ≥ 90/100/95/100, axe WCAG 2.2 AA sem violações em todas as rotas do sitemap, metadata e JSON-LD por rota, navegação por teclado e zero links internos quebrados. Relatório em `scripts/gauntlet/reports/latest.json`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`docs/runbook.md` — DNS (Cloudflare), deploy manual (`infra/deploy.sh`), deploy por GitHub Action (`.github/workflows/deploy.yml`), rollback e verificação.
 
-## Learn More
+## Licença
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Código sob MIT. Textos, imagens e identidade visual © Anderson Rafhael — todos os direitos reservados.
