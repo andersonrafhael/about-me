@@ -420,6 +420,9 @@ if (!SKIP.has("lighthouse")) {
 
 // ───────────────────────── 6. report ─────────────────────────
 stopServer();
+// keep the local server's own output next to the report: when wrangler dev dies
+// mid-run (ERR_CONNECTION_REFUSED on every later route) this is the only trace
+if (serverLog) writeFileSync(path.join(reportsDir, "server.log"), serverLog);
 const report = {
   at: new Date().toISOString(),
   ok: failures.length === 0,
