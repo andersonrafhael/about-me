@@ -1,124 +1,137 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import { SectionHeader } from "@/components/ui/section-header";
+import { channels, conversations } from "@/data/site";
+import { breadcrumb, collectionPage, serializeJsonLd } from "@/lib/json-ld";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Contato",
-  description: "Entre em contato com Anderson Rafhael. Projetos, parcerias ou só uma conversa.",
-};
-
-const channels = [
-  {
-    label: "Email",
-    value: "rafha.barbosa98@gmail.com",
-    href: "mailto:rafha.barbosa98@gmail.com",
-    hint: "Resposta < 24h, seg–sex",
-    n: "01",
-  },
-  {
-    label: "GitHub",
-    value: "github.com/andersonrafhael",
-    href: "https://github.com/andersonrafhael",
-    hint: "Código, projetos abertos",
-    n: "02",
-  },
-  {
-    label: "LinkedIn",
-    value: "linkedin.com/in/andersonrafhael",
-    href: "https://linkedin.com/in/andersonrafhael",
-    hint: "Perfil profissional",
-    n: "03",
-  },
-  {
-    label: "Requiem Co.",
-    value: "requiemcompany.com.br",
-    href: "https://requiemcompany.com.br",
-    hint: "Site da empresa",
-    n: "04",
-  },
-];
+  description:
+    "Fale com Anderson Rafhael sobre projetos para prefeituras e hospitais, parcerias institucionais, pesquisa ou imprensa. E-mail direto, resposta em 24 h úteis.",
+  path: "/contato",
+});
 
 export default function ContatoPage() {
   return (
-    <div className="min-h-screen px-site max-w-[1280px] mx-auto">
-
-      {/* ── Breadcrumb ── */}
-      <div className="pt-page mb-16">
-        <nav className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                        flex items-center gap-2.5" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-foreground transition-colors text-muted">Início</Link>
-          <span className="text-muted-2">/</span>
-          <span className="text-foreground font-medium">Contato</span>
-        </nav>
-      </div>
-
-      {/* ── Title block ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] items-end gap-4 sm:gap-8 mb-[clamp(56px,8vh,96px)]
-                      pb-[clamp(40px,5vh,64px)] border-b border-border">
-        <h1 className="editorial-title">
-          Contato<span className="punct">.</span>
-        </h1>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-muted text-right
-                        pb-4 leading-[1.8] hidden sm:block">
-          <span className="flex items-center gap-1.5 justify-end">
-            <span className="w-1.5 h-1.5 rounded-full bg-mint mint-pulse" aria-hidden />
-            <b className="text-mint font-medium">no ar</b>
-          </span>
-          Maceió, BRT<br />
-          Resposta rápida
-        </div>
-      </div>
-
-      {/* ── Intro ── */}
-      <div className="section-grid mb-[clamp(48px,6vh,80px)]">
-        <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted h-fit">
-          Sobre contato
-        </div>
-        <p className="text-[17px] text-foreground/80 leading-relaxed max-w-[52ch]">
-          Projetos institucionais, parcerias técnicas, oportunidades de pesquisa ou só uma
-          conversa sobre tecnologia pública. Prefiro direto ao ponto.
-        </p>
-      </div>
-
-      {/* ── Canais ── */}
-      <div className="flex flex-col divide-y divide-border border-t border-border">
-        {channels.map(({ label, value, href, hint, n }) => (
-          <a
-            key={n}
-            href={href}
-            target={href.startsWith("http") ? "_blank" : undefined}
-            rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="group flex items-center justify-between gap-6 py-6
-                       hover:bg-white/[0.015] transition-colors rounded px-2 -mx-2"
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            breadcrumb([
+              { name: "Início", path: "/" },
+              { name: "Contato", path: "/contato" },
+            ]),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            collectionPage({
+              name: "Contato",
+              description:
+                "Canais de contato de Anderson Rafhael e temas para conversar.",
+              path: "/contato",
+            }),
+          ),
+        }}
+      />
+      <div className="container-site px-site">
+        <div className="pt-page mb-12">
+          <nav
+            aria-label="Trilha"
+            className="mono-label flex items-center gap-2.5"
           >
-            <div className="flex items-center gap-5">
-              <span className="font-mono text-[11px] text-muted w-6 shrink-0">{n}</span>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-muted">
-                  {label}
-                </span>
-                <span className="text-foreground text-[15px] group-hover:text-primary transition-colors">
-                  {value}
-                </span>
-                <span className="font-mono text-[11px] text-muted">{hint}</span>
-              </div>
-            </div>
-            <span className="text-muted-2 group-hover:text-primary group-hover:translate-x-1
-                             group-hover:-translate-y-1 transition-all text-lg shrink-0"
-                  aria-hidden>
-              ↗
+            <Link
+              href="/"
+              className="text-foreground/70 transition-colors hover:text-fg-bright"
+            >
+              Início
+            </Link>
+            <span className="text-muted-2" aria-hidden>
+              /
             </span>
-          </a>
-        ))}
-      </div>
+            <span className="text-foreground">Contato</span>
+          </nav>
+        </div>
 
-      {/* ── Nota de rodapé ── */}
-      <div className="py-[clamp(64px,8vh,100px)]">
-        <p className="font-mono text-[11px] text-muted tracking-[0.12em] uppercase">
-          Maceió · Alagoas · Brasil ·{" "}
-          <span className="text-foreground/60">UTC-3 (BRT)</span>
-        </p>
-      </div>
+        <header className="mb-[clamp(48px,7vh,88px)] grid gap-6 border-b border-border pb-[clamp(32px,5vh,56px)] md:grid-cols-[1fr_auto] md:items-end">
+          <h1 className="editorial-title">
+            Contato<span className="punct">.</span>
+          </h1>
+          <p className="mono-label md:text-right">
+            resposta em até 24 h úteis · Maceió, AL
+          </p>
+        </header>
 
-    </div>
+        <section className="mb-[clamp(64px,9vh,112px)]">
+          <h2 className="sr-only">Canais de contato</h2>
+          <div className="flex flex-col divide-y divide-border border-t border-border">
+            {channels.map((c) => {
+              const isExternal = c.href.startsWith("http");
+              return (
+                <a
+                  key={c.n}
+                  href={c.href}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  className="surface-hover grid grid-cols-1 items-center gap-3 rounded-lg px-3 py-7 -mx-3 md:grid-cols-[56px_1fr_auto] md:gap-6"
+                >
+                  <span className="font-mono text-[12px] text-foreground/60">
+                    {c.n}
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-headline text-[22px] leading-tight text-fg-bright">
+                      {c.label}
+                      {isExternal && (
+                        <span className="sr-only"> (abre em nova aba)</span>
+                      )}
+                    </span>
+                    <span className="font-mono text-foreground/80">
+                      {c.value}
+                    </span>
+                    <span className="text-[13px] text-foreground/65">
+                      {c.hint}
+                    </span>
+                  </div>
+                  <span className="text-lg text-foreground/50" aria-hidden>
+                    {isExternal ? "↗" : ""}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+          <p className="mt-8 text-[13px] text-foreground/65">
+            Sem formulário: e-mail direto chega mais rápido e fica registrado.
+          </p>
+        </section>
+
+        <section className="pb-[clamp(64px,9vh,112px)]">
+          <SectionHeader
+            index="02"
+            eyebrow="Contato"
+            title={
+              <>
+                Sobre o que conversar<span className="punct">.</span>
+              </>
+            }
+          />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            {conversations.map((c) => (
+              <div key={c.title} className="surface rounded-xl p-6">
+                <h3 className="font-headline text-[17px] leading-snug text-fg-bright">
+                  {c.title}
+                </h3>
+                <p className="mt-2 text-[14px] leading-relaxed text-foreground/75">
+                  {c.detail}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

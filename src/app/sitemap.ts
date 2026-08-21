@@ -1,37 +1,36 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/data/projects";
+import { now, site } from "@/data/site";
 import { getAllPosts } from "@/lib/posts";
 
-const siteUrl = "https://andersonrafhael.requiemcompany.com.br";
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const updatedAt = new Date(now.updatedAt);
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { route: "", priority: 1 },
-    { route: "/projetos", priority: 0.8 },
-    { route: "/escrita", priority: 0.8 },
-    { route: "/pesquisa", priority: 0.7 },
-    { route: "/sobre", priority: 0.7 },
-    { route: "/contato", priority: 0.6 },
-  ].map(({ route, priority }) => ({
-    url: `${siteUrl}${route}`,
-    lastModified: now,
-    changeFrequency: "monthly",
+    { path: "", priority: 1 },
+    { path: "/projetos", priority: 0.9 },
+    { path: "/escrita", priority: 0.8 },
+    { path: "/pesquisa", priority: 0.7 },
+    { path: "/sobre", priority: 0.7 },
+    { path: "/contato", priority: 0.6 },
+  ].map(({ path, priority }) => ({
+    url: `${site.url}${path}`,
+    lastModified: updatedAt,
+    changeFrequency: "monthly" as const,
     priority,
   }));
 
   const projectRoutes: MetadataRoute.Sitemap = projects.map((p) => ({
-    url: `${siteUrl}/projetos/${p.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.7,
+    url: `${site.url}/projetos/${p.slug}`,
+    lastModified: updatedAt,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
   }));
 
   const postRoutes: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
-    url: `${siteUrl}/escrita/${post.slug}`,
+    url: `${site.url}/escrita/${post.slug}`,
     lastModified: new Date(post.date),
-    changeFrequency: "yearly",
+    changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 

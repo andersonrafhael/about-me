@@ -1,8 +1,19 @@
-import { notFound } from "next/navigation";
+import type { AnchorHTMLAttributes, ReactElement, ReactNode } from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllPosts, getPostBySlug, getPostContent } from "@/lib/posts";
+import { MDXRemote, type MDXRemoteProps } from "next-mdx-remote/rsc";
+import { ArticleToc, extractHeadings } from "@/components/article-toc";
+import { ReadingProgress } from "@/components/reading-progress";
+import { blogPosting, breadcrumb, serializeJsonLd } from "@/lib/json-ld";
+import {
+  getAdjacentPosts,
+  getAllPosts,
+  getPostBySlug,
+  getPostContent,
+} from "@/lib/posts";
+import { clampDescription, pageMetadata } from "@/lib/seo";
+import { slugify } from "@/lib/slugify";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -14,17 +25,76 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) return {};
-  return {
-    title: post.title,
-    description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      type: "article",
-      publishedTime: post.date,
-      tags: post.tags,
-    },
-  };
+  return pageMetadata({
+    ogImage: "file",
+    title: post.seoTitle ?? post.title,
+    ogTitle: post.title,
+    description: clampDescription(post.excerpt),
+    path: `/escrita/${post.slug}`,
+    type: "article",
+    publishedTime: post.date,
+    tags: post.tags,
+  });
+}
+
+function isReactElement(node: ReactNode): node is ReactElement {
+  return typeof node === "object" && node !== null && "props" in node;
+}
+
+/** Extrai o texto puro de um `children` do MDX (pode ter negrito, código etc). */
+function extractText(node: ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean")
+    return "";
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (isReactElement(node)) {
+    return extractText((node.props as { children?: ReactNode }).children);
+  }
+  return "";
+}
+
+function Heading2({ children }: { children?: ReactNode }) {
+  return <h2 id={slugify(extractText(children))}>{children}</h2>;
+}
+
+function Heading3({ children }: { children?: ReactNode }) {
+  return <h3 id={slugify(extractText(children))}>{children}</h3>;
+}
+
+function ProseLink({
+  href,
+  children,
+  ...rest
+}: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const isExternal = /^https?:\/\//.test(href ?? "");
+  if (!isExternal) {
+    return (
+      <a href={href} {...rest}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" {...rest}>
+      {children}
+      <span className="sr-only"> (abre em nova aba)</span>
+    </a>
+  );
+}
+
+const mdxComponents: MDXRemoteProps["components"] = {
+  h2: Heading2,
+  h3: Heading3,
+  a: ProseLink,
+};
+
+function formatLongDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 export default async function PostPage({ params }: Props) {
@@ -33,172 +103,189 @@ export default async function PostPage({ params }: Props) {
   const content = getPostContent(slug);
   if (!post || content === undefined) notFound();
 
-  const allPosts = getAllPosts();
-  const otherPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
-
-  const dateFormatted = new Date(post.date + "T00:00:00").toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const { previous, next } = getAdjacentPosts(slug);
+  const related = getAllPosts()
+    .filter((p) => p.slug !== slug)
+    .slice(0, 2);
+  const tocItems = extractHeadings(content);
+  const dateFormatted = formatLongDate(post.date);
 
   return (
-    <div className="min-h-screen px-site max-w-[1280px] mx-auto">
-
-      {/* ── Breadcrumb ── */}
-      <div className="pt-page mb-12">
-        <nav
-          className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                     flex items-center gap-2.5"
-          aria-label="Breadcrumb"
-        >
-          <Link href="/" className="hover:text-foreground transition-colors text-muted">
-            Início
-          </Link>
-          <span className="text-muted-2">/</span>
-          <Link href="/escrita" className="hover:text-foreground transition-colors text-muted">
-            Escrita
-          </Link>
-          <span className="text-muted-2">/</span>
-          <span className="text-foreground font-medium truncate max-w-[32ch]">{post.title}</span>
-        </nav>
-      </div>
-
-      {/* ── Header — full width ── */}
-      <header className="mb-[clamp(40px,6vh,72px)] pb-[clamp(32px,4vh,56px)] border-b border-border">
-        <div className="max-w-[72ch]">
-          {/* Meta linha */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-6">
-            <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-primary/70">
-              {post.tags[0]}
-            </span>
-            <span className="text-muted-3">·</span>
-            <time
-              dateTime={post.date}
-              className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted"
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            blogPosting({
+              slug: post.slug,
+              title: post.title,
+              description: post.excerpt,
+              date: post.date,
+              tags: post.tags,
+              readTime: post.readTime,
+            }),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            breadcrumb([
+              { name: "Início", path: "/" },
+              { name: "Escrita", path: "/escrita" },
+              { name: post.title },
+            ]),
+          ),
+        }}
+      />
+      <ReadingProgress />
+      <div className="container-site px-site">
+        <div className="pt-page mb-12">
+          <nav
+            aria-label="Trilha"
+            className="mono-label flex items-center gap-2.5"
+          >
+            <Link
+              href="/"
+              className="text-foreground/70 transition-colors hover:text-fg-bright"
             >
+              Início
+            </Link>
+            <span className="text-muted-2" aria-hidden>
+              /
+            </span>
+            <Link
+              href="/escrita"
+              className="text-foreground/70 transition-colors hover:text-fg-bright"
+            >
+              Escrita
+            </Link>
+            <span className="text-muted-2" aria-hidden>
+              /
+            </span>
+            <span className="max-w-[32ch] truncate text-foreground">
+              {post.title}
+            </span>
+          </nav>
+        </div>
+
+        <header className="mb-[clamp(48px,7vh,88px)] max-w-[72ch] border-b border-border pb-[clamp(32px,5vh,56px)]">
+          <div className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <span className="chip">{post.tags[0]}</span>
+            <span className="text-muted-2" aria-hidden>
+              ·
+            </span>
+            <time dateTime={post.date} className="mono-sublabel">
               {dateFormatted}
             </time>
-            <span className="text-muted-3">·</span>
-            <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-muted">
+            <span className="text-muted-2" aria-hidden>
+              ·
+            </span>
+            <span className="mono-sublabel">
               {post.readTime} min de leitura
             </span>
           </div>
-
-          {/* Título */}
-          <h1
-            className="font-headline font-bold text-fg-bright leading-[1.1] tracking-tight mb-6
-                       text-[clamp(28px,4.5vw,48px)]"
-          >
+          <h1 className="display mb-6 text-[clamp(32px,4.8vw,56px)]">
             {post.title}
           </h1>
+          <p className="lede border-l-2 border-primary pl-5">{post.excerpt}</p>
+        </header>
 
-          {/* Lead / excerpt */}
-          <p className="text-[17px] text-foreground/65 leading-relaxed border-l-2 border-primary/40 pl-5">
-            {post.excerpt}
-          </p>
-        </div>
-      </header>
+        <div className="grid gap-[clamp(40px,6vw,96px)] pb-[clamp(64px,8vh,100px)] lg:grid-cols-[minmax(0,72ch)_260px]">
+          <article data-article className="prose-article min-w-0">
+            <MDXRemote source={content} components={mdxComponents} />
+          </article>
 
-      {/* ── Layout 2 colunas: artigo + sidebar ── */}
-      <div className="flex gap-[clamp(40px,6vw,96px)] items-start pb-[clamp(64px,8vh,100px)]">
+          <aside className="hidden h-fit flex-col gap-6 sticky top-24 lg:flex">
+            <ArticleToc items={tocItems} />
 
-        {/* ── Conteúdo principal ── */}
-        <article className="prose-article min-w-0 flex-1 max-w-[72ch]">
-          <MDXRemote source={content} />
-        </article>
-
-        {/* ── Sidebar direita ── */}
-        <aside className="hidden lg:flex flex-col gap-6 w-[240px] shrink-0 sticky top-24">
-
-          {/* Metadata card */}
-          <div className="p-4 rounded-lg border border-border bg-surface-low flex flex-col gap-4">
-            <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
-              Sobre este artigo
-            </p>
-
-            <div className="flex flex-col gap-3">
-              <div>
-                <p className="font-mono text-[9px] text-muted-2 uppercase tracking-[0.12em] mb-0.5">
-                  Publicado
-                </p>
-                <time className="text-[12px] text-foreground">{dateFormatted}</time>
-              </div>
-              <div>
-                <p className="font-mono text-[9px] text-muted-2 uppercase tracking-[0.12em] mb-0.5">
-                  Leitura
-                </p>
-                <span className="text-[12px] text-foreground">{post.readTime} minutos</span>
-              </div>
-              <div>
-                <p className="font-mono text-[9px] text-muted-2 uppercase tracking-[0.12em] mb-2">
-                  Tags
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-1.5 py-0.5 rounded border border-border/60
-                                 font-mono text-[9px] text-muted tracking-[0.06em]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+            <div className="flex flex-col gap-4 border-t border-border pt-6">
+              <p className="mono-sublabel">Sobre este artigo</p>
+              <dl className="flex flex-col gap-3 text-[13px]">
+                <div>
+                  <dt className="mono-sublabel mb-1">Publicado</dt>
+                  <dd className="text-foreground/75">{dateFormatted}</dd>
                 </div>
-              </div>
+                <div>
+                  <dt className="mono-sublabel mb-1">Leitura</dt>
+                  <dd className="text-foreground/75">
+                    {post.readTime} minutos
+                  </dd>
+                </div>
+                <div>
+                  <dt className="mono-sublabel mb-2">Tags</dt>
+                  <dd className="flex flex-wrap gap-2">
+                    {post.tags.map((tag) => (
+                      <span key={tag} className="chip">
+                        {tag}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              </dl>
             </div>
-          </div>
 
-          {/* Outros artigos */}
-          {otherPosts.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted">
-                Leia também
-              </p>
-              {otherPosts.map((p) => (
-                <Link
-                  key={p.slug}
-                  href={`/escrita/${p.slug}`}
-                  className="group p-3 rounded-lg border border-border/40 hover:border-border/80
-                             bg-transparent hover:bg-surface-low transition-all duration-150"
-                >
-                  <span className="font-mono text-[9px] text-primary/60 tracking-[0.1em] uppercase block mb-1.5">
-                    {p.tags[0]}
-                  </span>
-                  <span className="text-[12px] text-foreground/75 leading-snug
-                                   group-hover:text-fg-bright transition-colors block">
+            {related.length > 0 && (
+              <div className="flex flex-col gap-3 border-t border-border pt-6">
+                <p className="mono-sublabel">Leia também</p>
+                {related.map((p) => (
+                  <Link
+                    key={p.slug}
+                    href={`/escrita/${p.slug}`}
+                    className="link-quiet text-[13px] leading-snug"
+                  >
                     {p.title}
-                  </span>
-                  <span className="font-mono text-[9px] text-muted-2 block mt-1.5">
-                    {p.readTime} min
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </aside>
+        </div>
 
-          {/* Voltar */}
+        <footer className="border-t border-border pb-[clamp(48px,6vh,80px)] pt-[clamp(32px,5vh,56px)]">
+          <div className="mb-8 flex flex-col gap-3">
+            {previous && (
+              <Link
+                href={`/escrita/${previous.slug}`}
+                className="surface surface-hover flex items-center justify-between gap-4 rounded-lg p-6"
+              >
+                <span className="flex flex-col gap-2">
+                  <span className="mono-label">Anterior</span>
+                  <span className="font-headline text-[17px] font-bold text-fg-bright">
+                    {previous.title}
+                  </span>
+                </span>
+                <span aria-hidden className="text-foreground/60">
+                  ←
+                </span>
+              </Link>
+            )}
+            {next && (
+              <Link
+                href={`/escrita/${next.slug}`}
+                className="surface surface-hover flex items-center justify-between gap-4 rounded-lg p-6"
+              >
+                <span className="flex flex-col gap-2">
+                  <span className="mono-label">Próximo</span>
+                  <span className="font-headline text-[17px] font-bold text-fg-bright">
+                    {next.title}
+                  </span>
+                </span>
+                <span aria-hidden className="text-foreground/60">
+                  →
+                </span>
+              </Link>
+            )}
+          </div>
           <Link
             href="/escrita"
-            className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted
-                       hover:text-foreground transition-colors flex items-center gap-1.5 mt-2"
+            className="mono-label flex items-center gap-2 text-foreground/70 transition-colors hover:text-fg-bright"
           >
             <span aria-hidden>←</span> Todos os artigos
           </Link>
-        </aside>
+        </footer>
       </div>
-
-      {/* ── Footer nav — mobile only ── */}
-      <div className="lg:hidden border-t border-border pt-8 pb-[clamp(48px,6vh,80px)]">
-        <Link
-          href="/escrita"
-          className="font-mono text-[11px] tracking-[0.18em] uppercase text-muted
-                     hover:text-foreground transition-colors flex items-center gap-2"
-        >
-          <span aria-hidden>←</span> Todos os artigos
-        </Link>
-      </div>
-
-    </div>
+    </>
   );
 }
