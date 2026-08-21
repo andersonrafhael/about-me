@@ -1,11 +1,18 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { getPostBySlug } from "@/lib/posts";
+import { getAllPosts, getPostBySlug } from "@/lib/posts";
 
 export const alt = "Anderson Rafhael — Escrita";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
+
+// Static export renders one image per post at build time.
+export async function generateStaticParams() {
+  return getAllPosts().map((p) => ({ slug: p.slug }));
+}
 
 const MONTHS_ABBR = [
   "jan",

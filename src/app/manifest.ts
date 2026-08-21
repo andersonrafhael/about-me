@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/data/site";
 
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Anderson Rafhael — Requiem Company",

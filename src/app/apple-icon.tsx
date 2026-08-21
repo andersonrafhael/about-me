@@ -4,6 +4,8 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
 
 export default async function AppleIcon() {
   // ImageResponse (Satori) só suporta ttf/otf/woff — woff2 falha em runtime com

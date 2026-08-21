@@ -3,6 +3,8 @@ import { ImageResponse } from "next/og";
 export const alt = "Anderson Rafhael — Requiem Company";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Static export: Turbopack requires metadata routes to declare themselves static.
+export const dynamic = "force-static";
 
 export default function OgImage() {
   return new ImageResponse(
