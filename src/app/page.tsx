@@ -1,19 +1,21 @@
 import { Hero } from "@/components/hero";
-import { FeaturedProjects } from "@/components/featured-projects";
-import { Manifesto } from "@/components/manifesto";
-import { WritingResearch } from "@/components/writing-research";
-import { EditorialFacts } from "@/components/editorial-facts";
-import { HomeCTA } from "@/components/home-cta";
+import { HomeCta } from "@/components/home/cta";
+import { Institutions } from "@/components/home/institutions";
+import { Manifesto } from "@/components/home/manifesto";
+import { Method } from "@/components/home/method";
+import { Products } from "@/components/home/products";
+import { WritingResearch } from "@/components/home/writing-research";
 
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <FeaturedProjects />
+      <Institutions />
+      <Products />
+      <Method />
       <Manifesto />
       <WritingResearch />
-      <EditorialFacts />
-      <HomeCTA />
+      <HomeCta />
     </>
   );
 }

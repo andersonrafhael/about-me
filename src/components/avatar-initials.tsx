@@ -23,7 +23,7 @@ export function AvatarInitials({ size = "md" }: Props) {
       }}
     >
       <span
-        className={`font-editorial font-bold text-primary select-none ${text}`}
+        className={`font-headline font-bold text-primary select-none ${text}`}
         style={{ letterSpacing: "-0.03em" }}
         aria-label="Anderson Rafhael"
       >

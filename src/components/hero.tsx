@@ -1,175 +1,117 @@
-"use client";
-
-import { motion } from "framer-motion";
+import type { CSSProperties } from "react";
 import Link from "next/link";
-import { metrics } from "@/data/metrics";
-import { TerminalTypewriter } from "@/components/terminal-typewriter";
 import { ConstellationCanvas } from "@/components/constellation-canvas";
+import { ProductFrame } from "@/components/ui/product-frame";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { media } from "@/data/media";
+import { featuredProjects } from "@/data/projects";
+import { hero, heroMetrics } from "@/data/site";
 
-const terminalLines = [
-  "ssh sigma.requiemcompany.com.br",
-  "// sistemas ativos · sinalização, infraestrutura",
-  "systemctl status sgtu",
-  "● active (running) · transporte escolar",
-];
+const rise = (ms: number) => ({ "--rise-delay": `${ms}ms` }) as CSSProperties;
 
-const fade = (delay: number) => ({
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
-});
+function Domain({ children }: { children: string }) {
+  return (
+    <em className="not-italic text-fg-bright underline decoration-primary/70 decoration-2 underline-offset-[0.18em]">
+      {children}
+    </em>
+  );
+}
 
 export function Hero() {
+  const [d1, d2, d3] = hero.subline.domains;
   return (
-    <section
-      className="relative min-h-screen flex flex-col justify-center overflow-hidden px-site"
-    >
-      {/* ── Constellation canvas (contida na hero) ── */}
+    <section className="relative overflow-hidden px-site" aria-labelledby="hero-title">
       <ConstellationCanvas />
-
-      {/* ── Editorial backdrop "01" ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-2vw] bottom-[-4vw] -z-10
-                   font-headline italic font-bold leading-[0.84] tracking-[-0.04em]
-                   text-foreground select-none"
-        style={{
-          fontSize: "clamp(280px, 38vw, 640px)",
-          opacity: 0.025,
-        }}
+        className="pointer-events-none absolute left-[38%] top-[40%] -z-10 h-[720px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(139,92,246,0.16) 0%, transparent 68%)" }}
+      />
+      <div
+        aria-hidden
+        className="numeral absolute -bottom-[5vw] -right-[2vw] -z-10 hidden lg:block"
+        style={{ fontSize: "clamp(280px, 34vw, 600px)" }}
       >
         01
       </div>
 
-      {/* ── Violet glow ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2
-                   -z-10 w-[600px] h-[600px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* ── Content ── */}
-      <div className="max-w-[1440px] w-full mx-auto grid lg:grid-cols-[1fr_380px] gap-16 lg:gap-24 items-center py-24">
-
-        {/* Coluna esquerda — copy */}
+      <div className="container-site grid min-h-[calc(100dvh-56px)] items-center gap-14 py-16 lg:grid-cols-[7fr_5fr] lg:gap-20 lg:py-24">
+        {/* ── copy ── */}
         <div className="flex flex-col gap-8">
-          {/* Eyebrow */}
-          <motion.div {...fade(0)} className="flex items-center gap-3">
-            <span className="relative w-2 h-2 rounded-full bg-mint shrink-0">
-              <span
-                className="absolute inset-[-3px] rounded-full border border-mint
-                           animate-[nav-ping_2.4s_ease-out_infinite] opacity-0"
-                aria-hidden
-              />
-            </span>
-            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-mint">
-              disponível para projetos · 2026
-            </span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.div {...fade(0.08)}>
-            <h1 className="hero-headline font-headline font-bold leading-[0.86] tracking-[-0.04em] text-fg-bright">
-              Infraestrutura digital<span className="text-primary">.</span>
-            </h1>
-            <p className="hero-subline font-headline italic text-foreground/70 leading-[0.9] tracking-[-0.03em] mt-2">
-              de ponta para{" "}
-              <span className="text-foreground underline decoration-primary/60 underline-offset-4 decoration-[2px]">gestão pública</span>
-              ,{" "}
-              <span className="text-foreground underline decoration-primary/60 underline-offset-4 decoration-[2px]">saúde</span>
-              {" "}e{" "}
-              <span className="text-foreground underline decoration-primary/60 underline-offset-4 decoration-[2px]">mobilidade</span>
-              .
+          <div className="rise">
+            <p className="mono-label flex items-center gap-3 text-mint">
+              <span className="relative inline-flex h-2 w-2 items-center justify-center text-mint">
+                <span className="status-dot ping" data-tone="live" aria-hidden />
+              </span>
+              {hero.eyebrow}
             </p>
-          </motion.div>
+          </div>
 
-          {/* Métricas */}
-          <motion.div
-            {...fade(0.16)}
-            className="flex flex-wrap gap-x-8 gap-y-3 pt-2"
-          >
-            {metrics.map((m) => (
-              <div key={m.label} className="flex flex-col">
-                <span className="font-headline font-bold text-fg-bright text-2xl leading-none tracking-tight">
-                  {m.value}
-                </span>
-                <span className="font-mono text-[11px] text-foreground/65 tracking-[0.12em] uppercase mt-1">
-                  {m.label}
-                </span>
-              </div>
-            ))}
-          </motion.div>
+          <div className="rise" style={rise(80)}>
+            <h1 id="hero-title" className="display hero-headline">
+              {hero.headline}
+              <span className="punct">.</span>
+            </h1>
+            <p className="hero-subline mt-3 font-headline font-medium leading-[1.05] tracking-[-0.03em] text-foreground/85">
+              {hero.subline.lead} <Domain>{d1}</Domain>, <Domain>{d2}</Domain> e <Domain>{d3}</Domain>.
+            </p>
+          </div>
 
-          {/* CTAs */}
-          <motion.div {...fade(0.22)} className="flex flex-wrap gap-3 pt-2">
-            <Link
-              href="/projetos"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
-                         bg-primary text-primary-foreground font-medium text-sm
-                         hover:bg-primary-deep transition-colors"
-            >
-              Ver projetos
-              <span aria-hidden>→</span>
-            </Link>
-            <Link
-              href="/escrita"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
-                         border border-border-2 text-foreground/65 font-medium text-sm
-                         hover:text-foreground hover:border-border transition-colors"
-            >
-              Ler artigos
-              <span aria-hidden>→</span>
-            </Link>
-          </motion.div>
+          <div className="rise" style={rise(160)}>
+            <p className="lede">{hero.dek}</p>
+          </div>
+
+          <div className="rise" style={rise(240)}>
+            <div className="flex flex-wrap gap-3">
+              <Link href={hero.primaryCta.href} className="btn btn-primary">
+                {hero.primaryCta.label}
+                <span aria-hidden>→</span>
+              </Link>
+              <Link href={hero.secondaryCta.href} className="btn btn-ghost">
+                {hero.secondaryCta.label}
+              </Link>
+            </div>
+          </div>
+
+          <div className="rise" style={rise(320)}>
+            <dl className="grid grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-6 sm:grid-cols-4">
+              {heroMetrics.map((m) => (
+                <div key={m.label} className="flex flex-col gap-1.5">
+                  <dd className="tabular font-headline text-[26px] font-bold leading-none text-fg-bright">{m.value}</dd>
+                  <dt className="font-mono text-[11px] leading-snug tracking-[0.04em] text-foreground/65">{m.label}</dt>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
 
-        {/* Coluna direita — meta-col */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3, duration: 0.65, ease: "easeOut" }}
-          className="hidden lg:flex flex-col gap-4"
-        >
-          {/* Status + meta card */}
-          <div className="glass-card rounded-xl p-5 flex flex-col gap-0">
-            <div className="flex items-center justify-between pb-3 mb-1 border-b border-border/40">
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-mint mint-pulse" aria-hidden />
-                <span className="text-fg-bright font-medium text-[14px]">Disponível para projetos</span>
-              </span>
-              <span className="font-mono text-[10px] text-mint tracking-[0.12em] uppercase">live</span>
+        {/* ── prova: um único DOM, colagem no desktop e pilha no mobile ── */}
+        <div className="rise" style={rise(280)}>
+          <div className="relative flex flex-col gap-5 lg:block lg:aspect-[5/4]">
+            <div className="lg:absolute lg:right-0 lg:top-0 lg:w-[88%]">
+              <ProductFrame item={media.sigmaLanding} caption={false} priority sizes="(min-width: 1024px) 38vw, 100vw" />
             </div>
-            {[
-              { k: "Base",    v: "Maceió, AL · Brasil" },
-              { k: "Foco",    v: "GovTech · HealthTech · EdTech" },
-              { k: "Capital", v: "Bootstrap · sem externo" },
-            ].map(({ k, v }) => (
-              <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-border/40 last:border-0">
-                <span className="font-mono text-[10px] text-foreground/60 tracking-[0.12em] uppercase shrink-0">
-                  {k}
-                </span>
-                <span className="text-[13px] text-foreground text-right">{v}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Terminal */}
-          <div className="glass-card rounded-xl overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40 bg-void/60">
-              <span className="w-2.5 h-2.5 rounded-full bg-destructive/70" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400/70" />
-              <span className="w-2.5 h-2.5 rounded-full bg-mint/70" />
-              <span className="ml-2 text-[11px] text-muted font-mono">~/requiemcompany</span>
+            <div className="hidden lg:absolute lg:bottom-0 lg:left-0 lg:block lg:w-[52%]">
+              <ProductFrame item={media.unipassPainelDemo} caption={false} sizes="(min-width: 1024px) 22vw, 100vw" tilt />
             </div>
-            <div className="p-5 min-h-[130px]">
-              <TerminalTypewriter lines={terminalLines} speed={38} />
+            <div className="glass rounded-xl p-4 lg:absolute lg:-bottom-8 lg:right-0 lg:w-[250px]">
+              <p className="mono-sublabel mb-2">Estado dos produtos</p>
+              <ul className="flex flex-col">
+                {featuredProjects.map((p) => (
+                  <li key={p.slug} className="flex items-center justify-between gap-3 border-b border-white/5 py-1.5 last:border-0">
+                    <Link href={`/projetos/${p.slug}`} className="text-[13px] text-foreground transition-colors hover:text-fg-bright">
+                      {p.name}
+                    </Link>
+                    <StatusBadge status={p.status} className="border-transparent px-0" />
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </motion.div>
-
+          <p className="mt-5 font-mono text-[10px] tracking-[0.06em] text-foreground/60 lg:mt-14 lg:text-right">
+            capturas · sigma.requiemcompany.com.br · painel do UniPass em demonstração
+          </p>
+        </div>
       </div>
     </section>
   );
