@@ -1,0 +1,21 @@
+// andersonrafhael.requiemcompany.com.br — site pessoal (estático, Cloudflare Workers static assets)
+// Deploy: npm run deploy  (= next build && wrangler deploy; exige sessão `wrangler login` ou CLOUDFLARE_API_TOKEN)
+// Domínio: andersonrafhael.requiemcompany.com.br (custom domain — zona requiemcompany.com.br; o deploy cria o DNS)
+// Gate antes de deployar: npm run quality + npm test + node scripts/gauntlet/check.mjs verdes.
+// Runbook: docs/runbook.md
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "andersonrafhael-site",
+  "compatibility_date": "2026-07-01",
+  "assets": {
+    "directory": "./out",
+    // `out/` tem `projetos.html` e `projetos/<slug>.html`: /projetos → projetos.html,
+    // /projetos/<slug> → projetos/<slug>.html; formas com barra final redirecionam (307), sem loop.
+    "html_handling": "auto-trailing-slash",
+    // `out/404.html` vem de src/app/not-found.tsx e é servido com status 404.
+    "not_found_handling": "404-page"
+  },
+  "routes": [
+    { "pattern": "andersonrafhael.requiemcompany.com.br", "custom_domain": true }
+  ]
+}

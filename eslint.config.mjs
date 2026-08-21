@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // cache local do wrangler dev (bundles temporários)
+    ".wrangler/**",
     // artefatos locais do harness / relatórios — não são código do site
     "quality-gate-ratchet.js",
     "scripts/gauntlet/reports/**",

@@ -2,8 +2,9 @@
 /**
  * Gauntlet exit predicate (Classe A) — andersonrafhael.requiemcompany.com.br
  *
- * Builds the site (unless --no-build), serves the production bundle on a local
- * port and measures it against scripts/gauntlet/thresholds.json:
+ * Builds the site (unless --no-build), serves the static export (`out/`) with
+ * `wrangler dev` on a local port and measures it against
+ * scripts/gauntlet/thresholds.json:
  *
  *   1. Lighthouse (mobile + desktop) on a representative route set
  *   2. axe-core WCAG 2.2 AA on EVERY route listed in /sitemap.xml
@@ -19,7 +20,7 @@
  *
  * Usage:
  *   node scripts/gauntlet/check.mjs                # full run
- *   node scripts/gauntlet/check.mjs --no-build     # reuse .next
+ *   node scripts/gauntlet/check.mjs --no-build     # reuse out/
  *   node scripts/gauntlet/check.mjs --skip=lighthouse   # fast inner loop
  *   node scripts/gauntlet/check.mjs --port=3100
  *   node scripts/gauntlet/check.mjs --base=https://andersonrafhael.requiemcompany.com.br   # audita a URL pública (sem build/serve)
@@ -42,7 +43,7 @@ const args = Object.fromEntries(
 );
 const PORT = Number(args.port ?? 3377); // porta alta pouco usual; o pré-voo abaixo garante que está livre
 // 127.0.0.1 on purpose: Node's fetch resolves `localhost` to ::1 first and the
-// first cold request to a Next server can exceed a short per-attempt timeout.
+// first cold request to the local server can exceed a short per-attempt timeout.
 const REMOTE = typeof args.base === "string" ? args.base.replace(/\/$/, "") : null;
 const BASE = REMOTE ?? `http://127.0.0.1:${PORT}`;
 const SKIP = new Set(String(args.skip ?? "").split(",").filter(Boolean));
@@ -81,7 +82,9 @@ try {
 } catch {}
 
 log(`▶ serve ${BASE}`);
-server = spawn("npx", ["next", "start", "-p", String(PORT)], {
+// wrangler dev serves out/ exactly like Workers static assets in production:
+// _headers, _redirects, html_handling and 404.html are all honoured.
+server = spawn("npx", ["wrangler", "dev", "--port", String(PORT), "--ip", "127.0.0.1"], {
   cwd: root,
   stdio: ["ignore", "pipe", "pipe"],
   env: { ...process.env, NODE_ENV: "production" },
@@ -234,7 +237,7 @@ for (const route of routes) {
           if (!internalLinks.has(p)) internalLinks.set(p, route);
         } else if (/^https?:\/\//.test(href)) {
           const u = new URL(href);
-          if (u.host === `localhost:${PORT}` || (REMOTE && u.origin === new URL(REMOTE).origin)) {
+          if (u.host === `localhost:${PORT}` || u.host === `127.0.0.1:${PORT}` || (REMOTE && u.origin === new URL(REMOTE).origin)) {
             const p = u.pathname.replace(/\/$/, "") || "/";
             if (!internalLinks.has(p)) internalLinks.set(p, route);
           } else if (!externalLinks.has(href)) externalLinks.set(href, route);

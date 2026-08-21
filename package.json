@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "preview": "wrangler dev --port 3001",
+    "deploy": "next build && wrangler deploy",
+    "cf:check": "wrangler deploy --dry-run",
     "lint": "eslint",
     "quality": "tsc --noEmit && eslint . --max-warnings 0 && next build",
     "test": "playwright test",
@@ -43,6 +45,7 @@
     "lighthouse": "^13.4.1",
     "tailwindcss": "^4",
     "tsx": "^4.22.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.125.0"
   }
 }

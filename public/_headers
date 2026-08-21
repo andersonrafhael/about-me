@@ -1,0 +1,37 @@
+# Cloudflare Workers static assets — cabeçalhos de resposta.
+# Espelha o que next.config.ts `headers()` aplicava no VPS; `output: "export"` não
+# emite cabeçalhos, então a camada Cloudflare os aplica a partir daqui.
+# Docs: https://developers.cloudflare.com/workers/static-assets/headers/
+
+# 'unsafe-inline' em script-src: o Next injeta scripts inline de hidratação sem
+# nonce, e o layout tem o marcador `html.js` e o JSON-LD. Sem terceiros, o resto
+# fica restrito à própria origem.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+# Tudo sob /_next/static/ tem hash de conteúdo no nome — cache imutável.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Rotas de metadata image (icon.tsx, apple-icon.tsx, opengraph-image.tsx) saem do
+# export sem extensão; o Content-Type não pode ser inferido do nome do arquivo.
+/icon
+  Content-Type: image/png
+/apple-icon
+  Content-Type: image/png
+/opengraph-image
+  Content-Type: image/png
+/projetos/:slug/opengraph-image
+  Content-Type: image/png
+/escrita/:slug/opengraph-image
+  Content-Type: image/png
+
+# feed.xml/route.ts devolvia estes cabeçalhos em runtime; o export descarta-os.
+/feed.xml
+  Content-Type: application/rss+xml; charset=utf-8
+  Cache-Control: public, max-age=3600
